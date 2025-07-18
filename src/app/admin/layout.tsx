@@ -80,8 +80,8 @@ export default function AdminLayout({
             </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
-        <header className="flex h-16 items-center justify-between border-b bg-background px-6">
+      <div className="flex flex-col w-full">
+        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-6">
             <div className="flex items-center gap-4">
                 <SidebarTrigger />
                 <div className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export default function AdminLayout({
         <main className="flex-1 p-6 bg-muted/40">
             {children}
         </main>
-      </SidebarInset>
+      </div>
     </SidebarProvider>
   )
 }
