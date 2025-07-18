@@ -40,7 +40,7 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarHeader className="p-4">
             <div className="flex items-center gap-3">
                  <Avatar>
