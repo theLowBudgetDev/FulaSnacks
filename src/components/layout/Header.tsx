@@ -91,18 +91,16 @@ export default function Header() {
             </Sheet>
         </div>
 
-        <div className="flex flex-1 justify-center md:justify-start">
-             <div className="flex items-center gap-6">
-                <Link href="/" className="flex items-center gap-2">
-                  <UtensilsCrossed className="h-6 w-6 text-primary" />
-                  <span className="hidden font-headline text-lg font-bold sm:inline-block">FulaSnacks</span>
-                </Link>
-                <nav className="hidden items-center gap-6 md:flex">
-                  {navLinks.map((link) => (
-                    <NavLink key={link.href} {...link} />
-                  ))}
-                </nav>
-            </div>
+        <div className="flex flex-1 items-center gap-6">
+            <Link href="/" className="flex items-center gap-2">
+                <UtensilsCrossed className="h-6 w-6 text-primary" />
+                <span className="hidden font-headline text-lg font-bold sm:inline-block">FulaSnacks</span>
+            </Link>
+            <nav className="hidden items-center gap-6 md:flex">
+                {navLinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+                ))}
+            </nav>
         </div>
         
         <div className="flex items-center justify-end gap-2">
