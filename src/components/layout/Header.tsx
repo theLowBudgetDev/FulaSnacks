@@ -28,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import { useSession, signOut } from "next-auth/react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -39,9 +39,11 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const { cart } = useCart();
+  const { data: session } = useSession();
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const isLoggedIn = true; 
+  const user = session?.user as any;
+  const isLoggedIn = !!user;
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link
@@ -104,19 +106,21 @@ export default function Header() {
         </div>
         
         <div className="flex items-center justify-end gap-2">
-          <Link href="/cart" className="relative p-2">
-              <ShoppingCart className="h-5 w-5 text-foreground" />
-              {cartItemCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{cartItemCount}</Badge>
-              )}
-              <span className="sr-only">Cart</span>
-          </Link>
+          <Button asChild variant="ghost" size="icon" className="relative hover:bg-transparent">
+            <Link href="/cart">
+                <ShoppingCart className="h-5 w-5 text-foreground" />
+                {cartItemCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{cartItemCount}</Badge>
+                )}
+                <span className="sr-only">Cart</span>
+            </Link>
+          </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="hover:bg-transparent">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar"/>
-                        <AvatarFallback>U</AvatarFallback>
+                        <AvatarImage src={user?.image || "https://placehold.co/100x100.png"} alt={user?.name || "User"} data-ai-hint="person avatar"/>
+                        <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                     <span className="sr-only">User Menu</span>
                 </Button>
@@ -124,7 +128,7 @@ export default function Header() {
               <DropdownMenuContent align="end">
                 {isLoggedIn ? (
                     <>
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                            <Link href="/profile"><User className="mr-2 h-4 w-4" />Profile</Link>
@@ -132,17 +136,23 @@ export default function Header() {
                         <DropdownMenuItem asChild>
                             <Link href="/orders"><ShoppingBagIcon className="mr-2 h-4 w-4" />My Orders</Link>
                         </DropdownMenuItem>
+                        
+                        {(user.role === 'ADMIN' || user.role === 'VENDOR') && <DropdownMenuSeparator />}
+                        
+                        {user.role === 'ADMIN' && (
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin"><ShieldCheck className="mr-2 h-4 w-4" />Admin Dashboard</Link>
+                            </DropdownMenuItem>
+                        )}
+                        {user.role === 'VENDOR' && (
+                           <DropdownMenuItem asChild>
+                                <Link href="/dashboard"><LayoutGrid className="mr-2 h-4 w-4" />Vendor Dashboard</Link>
+                            </DropdownMenuItem>
+                        )}
+                        
                         <DropdownMenuSeparator />
-                        <DropdownMenuLabel>For Staff</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <Link href="/dashboard"><LayoutGrid className="mr-2 h-4 w-4" />Vendor Dashboard</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/admin"><ShieldCheck className="mr-2 h-4 w-4" />Admin Dashboard</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href="/"><LogOut className="mr-2 h-4 w-4" />Logout</Link>
+                        <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+                            <LogOut className="mr-2 h-4 w-4" />Logout
                         </DropdownMenuItem>
                     </>
                 ) : (
