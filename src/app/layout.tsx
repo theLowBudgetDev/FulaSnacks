@@ -1,23 +1,32 @@
+
+"use client";
+
 import type { Metadata } from "next";
+import { usePathname } from "next/navigation";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/context/CartContext";
 
-export const metadata: Metadata = {
-  title: "FulaSnacks",
-  description: "The easiest way to order snacks on campus.",
-};
+// export const metadata: Metadata = {
+//   title: "FulaSnacks",
+//   description: "The easiest way to order snacks on campus.",
+// };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isDashboard = pathname.startsWith('/dashboard');
+
   return (
     <html lang="en" className="light">
       <head>
+        <title>FulaSnacks</title>
+        <meta name="description" content="The easiest way to order snacks on campus." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -31,12 +40,21 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <CartProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
+          {isDashboard ? (
+            <>
+              {children}
+              <Toaster />
+            </>
+          ) : (
+            <>
+              <div className="flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+              <Toaster />
+            </>
+          )}
         </CartProvider>
       </body>
     </html>
