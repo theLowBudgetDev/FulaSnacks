@@ -12,12 +12,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MoreHorizontal, User as UserIcon } from "lucide-react";
 import { PaginationComponent } from '@/components/shared/PaginationComponent';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
+import { UserProfileDialog } from '@/components/admin/UserProfileDialog';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<User[]>(allUsers);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
+    const { toast } = useToast();
 
     const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
     const paginatedUsers = users.slice(
@@ -34,7 +39,28 @@ export default function AdminUsersPage() {
         }
     };
 
+    const handleViewProfile = (user: User) => {
+        setSelectedUser(user);
+        setIsProfileDialogOpen(true);
+    };
+
+    const handleResetPassword = (user: User) => {
+        toast({
+            title: "Password Reset Sent",
+            description: `A password reset link has been sent to ${user.email}.`,
+        });
+    };
+
+    const handleSuspendUser = (user: User) => {
+        toast({
+            variant: "destructive",
+            title: "User Suspended",
+            description: `${user.name} (${user.email}) has been suspended.`,
+        });
+    };
+
   return (
+    <>
     <Card>
         <CardHeader>
             <CardTitle>User Management</CardTitle>
@@ -80,10 +106,10 @@ export default function AdminUsersPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>View Profile</DropdownMenuItem>
-                                <DropdownMenuItem>Reset Password</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleViewProfile(user)}>View Profile</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResetPassword(user)}>Reset Password</DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive">Suspend User</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onClick={() => handleSuspendUser(user)}>Suspend User</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </TableCell>
@@ -100,5 +126,14 @@ export default function AdminUsersPage() {
         />
       </CardFooter>
     </Card>
+
+    {selectedUser && (
+        <UserProfileDialog
+            user={selectedUser}
+            open={isProfileDialogOpen}
+            onOpenChange={setIsProfileDialogOpen}
+        />
+    )}
+    </>
   );
 }

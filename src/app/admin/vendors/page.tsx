@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { vendors as initialVendors } from "@/lib/placeholder-data";
 import type { Vendor } from '@/lib/types';
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +16,15 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Store } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { DeleteVendorDialog } from '@/components/admin/DeleteVendorDialog';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminVendorsPage() {
     const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const { toast } = useToast();
 
     const totalPages = Math.ceil(vendors.length / ITEMS_PER_PAGE);
@@ -36,9 +40,27 @@ export default function AdminVendorsPage() {
             title: `Vendor ${isApproved ? 'Approved' : 'Suspended'}`,
             description: `${vendorName} has been updated.`,
         });
+    };
+
+    const handleDeleteVendor = (vendor: Vendor) => {
+        setSelectedVendor(vendor);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const confirmDeleteVendor = () => {
+        if(selectedVendor) {
+            setVendors(vendors.filter(v => v.id !== selectedVendor.id));
+             toast({
+                title: "Vendor Deleted",
+                description: `${selectedVendor.name} has been removed.`,
+            });
+        }
+        setIsDeleteDialogOpen(false);
+        setSelectedVendor(null);
     }
 
   return (
+      <>
     <Card>
         <CardHeader>
             <CardTitle>Vendor Management</CardTitle>
@@ -91,10 +113,14 @@ export default function AdminVendorsPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                    <DropdownMenuItem>View Dashboard</DropdownMenuItem>
-                                    <DropdownMenuItem>View Products</DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/dashboard">View Dashboard</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/dashboard/products">View Products</Link>
+                                    </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-destructive">Delete Vendor</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteVendor(vendor)}>Delete Vendor</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -112,5 +138,12 @@ export default function AdminVendorsPage() {
         />
       </CardFooter>
     </Card>
+    <DeleteVendorDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={confirmDeleteVendor}
+        vendorName={selectedVendor?.name}
+    />
+    </>
   );
 }

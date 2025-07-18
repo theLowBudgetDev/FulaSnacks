@@ -1,12 +1,14 @@
 
 "use client";
 
+import Link from 'next/link';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter
 } from "@/components/ui/card";
 import {
   Table,
@@ -17,11 +19,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from '@/components/ui/button';
 import {
   DollarSign,
   Users,
   Store,
   Utensils,
+  ArrowRight,
 } from "lucide-react";
 import {
   Bar,
@@ -181,6 +185,14 @@ export default function AdminDashboardPage() {
                 </TableBody>
             </Table>
           </CardContent>
+           <CardFooter className="justify-end">
+            <Button asChild variant="link" size="sm">
+                <Link href="/admin/orders">
+                    View All Orders
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </div>

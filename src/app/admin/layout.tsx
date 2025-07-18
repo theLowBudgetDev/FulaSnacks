@@ -16,10 +16,11 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Home, Users, Store, Settings, LogOut, ShieldCheck } from "lucide-react";
+import { Home, Users, Store, Settings, LogOut, ShieldCheck, ShoppingBag } from "lucide-react";
 
 const navItems = [
     { href: "/admin", label: "Dashboard", icon: Home },
+    { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/vendors", label: "Vendors", icon: Store },
     { href: "/admin/settings", label: "Settings", icon: Settings },
