@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
@@ -15,6 +16,6 @@ model User {
   email     String   @unique
   name      String
   password  String
-  role      String   @default("CUSTOMER") // Changed from enum to String
+  role      String   @default("CUSTOMER") // "CUSTOMER", "VENDOR", "ADMIN"
   createdAt DateTime @default(now())
 }
