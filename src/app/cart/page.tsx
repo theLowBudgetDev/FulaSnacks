@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { CreditCard, Trash2 } from "lucide-react";
+import { CreditCard, Trash2, Plus, Minus } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CartPage() {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -22,14 +22,7 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     if (cart.length > 0) {
-      toast({
-        title: "Order Placed!",
-        description: "You will be redirected to the payment gateway.",
-      });
-      // In a real app, you would redirect to a payment processor
-      // and then create an order on success.
-      clearCart();
-      router.push('/orders');
+      router.push(`/payment?amount=${total}`);
     } else {
       toast({
         variant: 'destructive',
@@ -74,7 +67,13 @@ export default function CartPage() {
                         <p className="text-sm text-muted-foreground">₦{item.snack.price.toLocaleString()}</p>
                       </div>
                       <div className="flex items-center gap-2">
+                         <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.snack.id, item.quantity - 1)}>
+                            <Minus className="h-4 w-4"/>
+                         </Button>
                          <Input type="number" value={item.quantity} className="w-16 h-9 text-center" readOnly />
+                         <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.snack.id, item.quantity + 1)}>
+                            <Plus className="h-4 w-4"/>
+                         </Button>
                       </div>
                       <p className="font-semibold w-20 text-right">₦{(item.snack.price * item.quantity).toLocaleString()}</p>
                       <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.snack.id)}>
@@ -113,7 +112,7 @@ export default function CartPage() {
                        <p className="text-sm text-muted-foreground">
                            You will be redirected to our secure payment gateway to complete your purchase.
                        </p>
-                       <Button onClick={handleCheckout} className="w-full bg-primary text-primary-foreground hover:bg-primary/90" size="lg">
+                       <Button onClick={handleCheckout} className="w-full bg-accent text-accent-foreground hover:bg-accent/90" size="lg">
                            <CreditCard className="mr-2 h-5 w-5" />
                            Proceed to Payment
                        </Button>

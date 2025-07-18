@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Metadata } from "next";
+import { Suspense } from 'react';
 import { usePathname } from "next/navigation";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,6 +21,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isDashboard = pathname.startsWith('/dashboard');
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/payment');
 
   return (
     <html lang="en" className="light">
@@ -40,21 +41,23 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <CartProvider>
-          {isDashboard ? (
-            <>
-              {children}
-              <Toaster />
-            </>
-          ) : (
-            <>
-              <div className="flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-              <Toaster />
-            </>
-          )}
+            <Suspense>
+              {isDashboard || isAuthPage ? (
+                <>
+                  {children}
+                  <Toaster />
+                </>
+              ) : (
+                <>
+                  <div className="flex min-h-screen flex-col">
+                    <Header />
+                    <main className="flex-1">{children}</main>
+                    <Footer />
+                  </div>
+                  <Toaster />
+                </>
+              )}
+            </Suspense>
         </CartProvider>
       </body>
     </html>
