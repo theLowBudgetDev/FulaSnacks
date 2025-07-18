@@ -23,7 +23,7 @@ export default function RootLayout({
   const showHeaderFooter = !isDashboard && !isAdmin && !isAuthPage;
 
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="light" suppressHydrationWarning>
       <head>
         <title>FulaSnacks</title>
         <meta name="description" content="The easiest way to order snacks on campus." />
