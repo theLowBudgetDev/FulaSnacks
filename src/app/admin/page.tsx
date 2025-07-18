@@ -1,7 +1,10 @@
 
+<<<<<<< HEAD
 
 "use client";
 
+=======
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import Link from 'next/link';
 import {
   Card,
@@ -35,6 +38,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+<<<<<<< HEAD
 import { useEffect, useState } from 'react';
 import type { Order, User, Vendor } from '@/lib/types';
 import prisma from '@/lib/prisma';
@@ -48,6 +52,10 @@ const salesData = [
   { name: "Sat", total: Math.floor(Math.random() * 5000) + 1000 },
   { name: "Sun", total: Math.floor(Math.random() * 5000) + 1000 },
 ];
+=======
+import { prisma } from '@/lib/prisma';
+import { format, subDays } from 'date-fns';
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
 const getStatusVariant = (status: string) => {
     switch (status) {
@@ -64,6 +72,7 @@ const getStatusVariant = (status: string) => {
     }
 };
 
+<<<<<<< HEAD
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
     totalRevenue: 0,
@@ -91,6 +100,52 @@ export default function AdminDashboardPage() {
     fetchData();
   }, []);
 
+=======
+export default async function AdminDashboardPage() {
+  const sevenDaysAgo = subDays(new Date(), 7);
+
+  const totalRevenue = await prisma.order.aggregate({
+    where: { status: 'Completed' },
+    _sum: { total: true },
+  });
+
+  const totalUsers = await prisma.user.count();
+  const activeVendors = await prisma.vendor.count({ where: { isApproved: true } });
+  const totalOrdersCount = await prisma.order.count();
+
+  const recentOrders = await prisma.order.findMany({
+    take: 5,
+    orderBy: { createdAt: 'desc' },
+    include: { user: true },
+  });
+
+  const weeklySales = await prisma.order.findMany({
+    where: {
+      createdAt: { gte: sevenDaysAgo },
+      status: 'Completed',
+    },
+    select: {
+      createdAt: true,
+      total: true,
+    },
+  });
+
+  const salesData = Array.from({ length: 7 }).map((_, i) => {
+    const date = subDays(new Date(), 6 - i);
+    return {
+      name: format(date, 'EEE'),
+      total: 0,
+    };
+  });
+
+  weeklySales.forEach(sale => {
+    const dayName = format(sale.createdAt, 'EEE');
+    const day = salesData.find(d => d.name === dayName);
+    if (day) {
+      day.total += sale.total;
+    }
+  });
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   return (
     <div className="flex flex-col gap-6">
@@ -101,7 +156,11 @@ export default function AdminDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
+<<<<<<< HEAD
             <div className="text-2xl font-bold">₦{stats.totalRevenue.toLocaleString()}</div>
+=======
+            <div className="text-2xl font-bold">₦{(totalRevenue._sum.total || 0).toLocaleString()}</div>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               Across all vendors
             </p>
@@ -113,7 +172,11 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
+<<<<<<< HEAD
             <div className="text-2xl font-bold">{stats.totalUsers}</div>
+=======
+            <div className="text-2xl font-bold">{totalUsers}</div>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               Customers and Vendors
             </p>
@@ -125,7 +188,11 @@ export default function AdminDashboardPage() {
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
+<<<<<<< HEAD
             <div className="text-2xl font-bold">{stats.approvedVendors}</div>
+=======
+            <div className="text-2xl font-bold">{activeVendors}</div>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               Total approved vendors
             </p>
@@ -137,7 +204,11 @@ export default function AdminDashboardPage() {
             <Utensils className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
+<<<<<<< HEAD
             <div className="text-2xl font-bold">{stats.totalOrders}</div>
+=======
+            <div className="text-2xl font-bold">{totalOrdersCount}</div>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               In platform history
             </p>
@@ -200,7 +271,11 @@ export default function AdminDashboardPage() {
                             <TableCell>
                                 <div className="font-medium">{order.id.substring(0,8)}...</div>
                                 <div className="hidden text-sm text-muted-foreground md:inline">
+<<<<<<< HEAD
                                     {order.user?.email}
+=======
+                                    {order.user.email}
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                                 </div>
                             </TableCell>
                             <TableCell>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import VendorCard from "@/components/shared/VendorCard";
 import prisma from "@/lib/prisma";
 
@@ -13,6 +14,34 @@ export default async function VendorsPage() {
         owner: true,
     }
   });
+=======
+
+import VendorCard from "@/components/shared/VendorCard";
+import { PaginationComponent } from '@/components/shared/PaginationComponent';
+import { prisma } from "@/lib/prisma";
+
+const ITEMS_PER_PAGE = 6;
+
+export default async function VendorsPage({ searchParams }: { searchParams: { page?: string }}) {
+  const currentPage = Number(searchParams?.page) || 1;
+
+  const vendorsCount = await prisma.vendor.count({
+    where: { isApproved: true },
+  });
+
+  const vendors = await prisma.vendor.findMany({
+    where: { isApproved: true },
+    take: ITEMS_PER_PAGE,
+    skip: (currentPage - 1) * ITEMS_PER_PAGE,
+    orderBy: { user: { name: 'asc' } },
+    include: {
+        user: true,
+        products: true,
+    }
+  });
+
+  const totalPages = Math.ceil(vendorsCount / ITEMS_PER_PAGE);
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   return (
     <div className="bg-card">
@@ -30,6 +59,15 @@ export default async function VendorsPage() {
                 <VendorCard key={vendor.id} vendor={vendor} />
             ))}
         </div>
+<<<<<<< HEAD
+=======
+        <div className="mt-12 flex justify-center">
+             <PaginationComponent 
+                totalPages={totalPages}
+                currentPage={currentPage}
+            />
+        </div>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
       </div>
     </div>
   );

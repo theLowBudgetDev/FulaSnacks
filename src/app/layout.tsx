@@ -9,6 +9,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
+import { AuthProvider } from '@/context/AuthContext';
 
 export default function RootLayout({
   children,
@@ -18,7 +19,7 @@ export default function RootLayout({
   const pathname = usePathname();
   const isDashboard = pathname.startsWith('/dashboard');
   const isAdmin = pathname.startsWith('/admin');
-  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/payment') || pathname.startsWith('/admin/login');
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup');
 
   const showHeaderFooter = !isDashboard && !isAdmin && !isAuthPage;
 
@@ -39,6 +40,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
+       <AuthProvider>
         <FavoritesProvider>
           <CartProvider>
               <Suspense>
@@ -55,6 +57,7 @@ export default function RootLayout({
               </Suspense>
           </CartProvider>
         </FavoritesProvider>
+       </AuthProvider>
       </body>
     </html>
   );

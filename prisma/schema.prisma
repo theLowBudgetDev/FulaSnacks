@@ -1,15 +1,19 @@
+<<<<<<< HEAD
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
+=======
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
 
+<<<<<<< HEAD
 model User {
   id        String   @id @default(cuid())
   name      String
@@ -18,6 +22,20 @@ model User {
   role      String   @default("CUSTOMER") // Replaced enum with String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+=======
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("CUSTOMER") // "CUSTOMER", "VENDOR", "ADMIN"
+  createdAt DateTime @default(now())
+  avatarUrl String?
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   orders  Order[]
   reviews Review[]
@@ -25,6 +43,7 @@ model User {
 }
 
 model Vendor {
+<<<<<<< HEAD
   id             String   @id @default(cuid())
   name           String
   description    String
@@ -39,6 +58,17 @@ model Vendor {
 
   products Snack[]
   reviews  Review[]
+=======
+  id               String  @id @default(cuid())
+  description      String
+  logoUrl          String?
+  campusLocation   String
+  isApproved       Boolean @default(false)
+  userId           String  @unique
+  user             User    @relation(fields: [userId], references: [id])
+  
+  products Snack[]
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 }
 
 model Snack {
@@ -49,10 +79,16 @@ model Snack {
   imageUrl    String
   category    String
   createdAt   DateTime @default(now())
+<<<<<<< HEAD
   updatedAt   DateTime @updatedAt
 
   vendor   Vendor @relation(fields: [vendorId], references: [id])
   vendorId String
+=======
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   orderItems OrderItem[]
   reviews    Review[]
@@ -61,12 +97,21 @@ model Snack {
 model Order {
   id        String   @id @default(cuid())
   total     Float
+<<<<<<< HEAD
   status    String   @default("PLACED") // Replaced enum with String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
+=======
+  status    String   // "Preparing", "Ready for Pickup", "Completed", "Cancelled"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   items OrderItem[]
 }
@@ -74,6 +119,7 @@ model Order {
 model OrderItem {
   id        String @id @default(cuid())
   quantity  Int
+<<<<<<< HEAD
   price     Float
   createdAt DateTime @default(now())
 
@@ -82,10 +128,21 @@ model OrderItem {
 
   snack   Snack  @relation(fields: [snackId], references: [id])
   snackId String
+=======
+  price     Float // Price of the snack at the time of order
+  snackId   String
+  orderId   String
+
+  snack Snack @relation(fields: [snackId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@unique([snackId, orderId])
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 }
 
 model Review {
   id        String   @id @default(cuid())
+<<<<<<< HEAD
   rating    Int
   comment   String?
   createdAt DateTime @default(now())
@@ -97,4 +154,17 @@ model Review {
   snackId  String?
   vendor   Vendor?  @relation(fields: [vendorId], references: [id])
   vendorId String?
+=======
+  rating    Int // 1 to 5
+  comment   String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  snackId String
+  snack   Snack  @relation(fields: [snackId], references: [id])
+  
+  @@unique([userId, snackId])
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 }

@@ -1,7 +1,11 @@
 
 "use client";
 
+<<<<<<< HEAD
 import { useState, useMemo, useEffect } from 'react';
+=======
+import { useState, useEffect } from 'react';
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import type { User } from '@/lib/types';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,20 +19,33 @@ import { useToast } from '@/hooks/use-toast';
 import { UserProfileDialog } from '@/components/admin/UserProfileDialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+<<<<<<< HEAD
+=======
+import { useRouter, useSearchParams } from 'next/navigation';
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminUsersPage() {
+<<<<<<< HEAD
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+=======
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { toast } = useToast();
+    
+    const [users, setUsers] = useState<User[]>([]);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [loading, setLoading] = useState(true);
+    
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [roleFilter, setRoleFilter] = useState('all');
-    const { toast } = useToast();
 
+<<<<<<< HEAD
     useEffect(() => {
         async function fetchUsers() {
             setLoading(true);
@@ -47,21 +64,58 @@ export default function AdminUsersPage() {
             return matchesSearch && matchesRole;
         });
     }, [users, searchTerm, roleFilter]);
+=======
+    const searchTerm = searchParams.get('search') || '';
+    const roleFilter = searchParams.get('role') || 'all';
+    const currentPage = Number(searchParams.get('page') || '1');
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
-    const paginatedUsers = useMemo(() => {
-        return filteredUsers.slice(
-            (currentPage - 1) * ITEMS_PER_PAGE,
-            currentPage * ITEMS_PER_PAGE
-        );
-    }, [filteredUsers, currentPage]);
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setLoading(true);
+            const params = new URLSearchParams({
+                search: searchTerm,
+                role: roleFilter,
+                page: String(currentPage),
+                limit: String(ITEMS_PER_PAGE),
+            });
+            // const res = await fetch(`/api/admin/users?${params.toString()}`);
+            // const data = await res.json();
+            // setUsers(data.users);
+            // setTotalUsers(data.total);
+            setLoading(false);
+        };
+        fetchUsers();
+    }, [searchTerm, roleFilter, currentPage]);
     
-    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(totalUsers / ITEMS_PER_PAGE);
+
+    const handleSearch = (term: string) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('search', term);
+        params.set('page', '1');
+        router.push(`/admin/users?${params.toString()}`);
+    }
+
+    const handleFilter = (role: string) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('role', role);
+        params.set('page', '1');
+        router.push(`/admin/users?${params.toString()}`);
+    }
     
     const getRoleVariant = (role: string) => {
+<<<<<<< HEAD
         switch (role) {
             case 'ADMIN': return 'destructive';
             case 'VENDOR': return 'default';
             case 'CUSTOMER': return 'secondary';
+=======
+        switch (role.toLowerCase()) {
+            case 'admin': return 'destructive';
+            case 'vendor': return 'default';
+            case 'customer': return 'secondary';
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             default: return 'outline';
         }
     };
@@ -101,25 +155,19 @@ export default function AdminUsersPage() {
                     type="search"
                     placeholder="Search by name or email..."
                     className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setCurrentPage(1);
-                    }}
+                    defaultValue={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
                 />
             </div>
-            <Select value={roleFilter} onValueChange={(value) => {
-                setRoleFilter(value);
-                setCurrentPage(1);
-            }}>
+            <Select value={roleFilter} onValueChange={handleFilter}>
                 <SelectTrigger className="w-full md:w-[200px]">
                     <SelectValue placeholder="Filter by role" />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="customer">Customer</SelectItem>
-                    <SelectItem value="vendor">Vendor</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="CUSTOMER">Customer</SelectItem>
+                    <SelectItem value="VENDOR">Vendor</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
                 </SelectContent>
             </Select>
         </div>
@@ -137,6 +185,7 @@ export default function AdminUsersPage() {
           </TableHeader>
           <TableBody>
             {loading ? (
+<<<<<<< HEAD
                 [...Array(ITEMS_PER_PAGE)].map((_, i) => (
                     <TableRow key={i}>
                         <TableCell><Skeleton className="h-10 w-40" /></TableCell>
@@ -148,10 +197,18 @@ export default function AdminUsersPage() {
                 ))
             ) : paginatedUsers.length > 0 ? (
                 paginatedUsers.map(user => (
+=======
+                Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell colSpan={5}><Skeleton className="h-10 w-full" /></TableCell>
+                    </TableRow>
+                ))
+            ) : users.map(user => (
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                 <TableRow key={user.id}>
                     <TableCell className="font-medium flex items-center gap-3">
                         <Avatar>
-                            <AvatarImage src={user.avatarUrl} alt={user.name} />
+                            <AvatarImage src={user.avatarUrl || ''} alt={user.name} />
                             <AvatarFallback>
                                 <UserIcon />
                             </AvatarFallback>
@@ -181,8 +238,13 @@ export default function AdminUsersPage() {
                         </DropdownMenu>
                     </TableCell>
                 </TableRow>
+<<<<<<< HEAD
             ))
             ) : (
+=======
+            ))}
+             {users.length === 0 && !loading && (
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                 <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                         No users found.
@@ -196,7 +258,6 @@ export default function AdminUsersPage() {
         <PaginationComponent 
             totalPages={totalPages}
             currentPage={currentPage}
-            onPageChange={setCurrentPage}
         />
       </CardFooter>
     </Card>

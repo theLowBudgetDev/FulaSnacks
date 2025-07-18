@@ -1,15 +1,21 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+<<<<<<< HEAD
 import prisma from '@/lib/prisma';
+=======
+import { prisma } from '@/lib/prisma';
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import SnackCard from '@/components/shared/SnackCard';
 import { MapPin, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { format } from 'date-fns';
 
 export default async function VendorDetailPage({ params }: { params: { id: string } }) {
   const vendor = await prisma.vendor.findUnique({
     where: { id: params.id, isApproved: true },
     include: {
+<<<<<<< HEAD
       products: {
         include: {
           reviews: {
@@ -35,12 +41,22 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
         },
       },
       owner: true,
+=======
+      user: true,
+      products: {
+        include: {
+          vendor: { include: { user: true } },
+          reviews: { include: { user: true } },
+        }
+      },
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
     },
   });
 
   if (!vendor) {
     notFound();
   }
+<<<<<<< HEAD
   
   const snacks = vendor.products;
 
@@ -61,7 +77,19 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
   const averageRating = allReviews.length > 0
     ? allReviews.reduce((acc, review) => acc + review.rating, 0) / allReviews.length
     : 0;
+=======
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
+  const reviews = await prisma.review.findMany({
+    where: { snack: { vendorId: vendor.id } },
+    include: { user: true },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  });
+
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+    : 0;
 
   return (
     <div>
@@ -69,27 +97,35 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <Image
-              src={vendor.logoUrl}
-              alt={`${vendor.name} logo`}
+              src={vendor.logoUrl || 'https://placehold.co/150x150.png'}
+              alt={`${vendor.user.name} logo`}
               width={150}
               height={150}
               className="rounded-full border-4 border-background shadow-lg"
               data-ai-hint="logo cooking"
             />
             <div className="text-center md:text-left">
-              <h1 className="font-headline text-4xl font-bold md:text-5xl">{vendor.name}</h1>
+              <h1 className="font-headline text-4xl font-bold md:text-5xl">{vendor.user.name}</h1>
               <p className="mt-2 text-lg text-muted-foreground max-w-2xl">{vendor.description}</p>
               <div className="mt-4 flex items-center justify-center md:justify-start gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
                     <span>{vendor.campusLocation}</span>
                 </div>
+<<<<<<< HEAD
                 {allReviews.length > 0 && (
+=======
+                {reviews.length > 0 && (
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                  <>
                     <Separator orientation="vertical" className="h-5"/>
                     <div className="flex items-center gap-1.5 text-amber-500 font-medium">
                         <Star className="h-5 w-5 fill-current" />
+<<<<<<< HEAD
                         <span>{averageRating.toFixed(1)} ({allReviews.length} reviews)</span>
+=======
+                        <span>{averageRating.toFixed(1)} ({reviews.length} reviews)</span>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                     </div>
                  </>
                 )}
@@ -104,11 +140,11 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="md:col-span-3">
                 <h2 className="font-headline text-3xl font-bold mb-8">
-                    Snacks from {vendor.name}
+                    Snacks from {vendor.user.name}
                 </h2>
-                {snacks.length > 0 ? (
+                {vendor.products.length > 0 ? (
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {snacks.map((snack) => (
+                    {vendor.products.map((snack) => (
                         <SnackCard key={snack.id} snack={snack} />
                     ))}
                     </div>
@@ -120,10 +156,17 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
                  <h2 className="font-headline text-3xl font-bold mb-8">
                     Reviews
                 </h2>
+<<<<<<< HEAD
                 {allReviews.length > 0 ? (
                     <Card>
                         <CardContent className="p-6 space-y-6">
                             {allReviews.slice(0, 5).map(review => (
+=======
+                {reviews.length > 0 ? (
+                    <Card>
+                        <CardContent className="p-6 space-y-6">
+                            {reviews.map(review => (
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                                 <div key={review.id}>
                                     <div className="flex items-center justify-between">
                                         <p className="font-semibold">{review.user.name}</p>
@@ -133,6 +176,7 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
                                             ))}
                                         </div>
                                     </div>
+                                    <p className="text-xs text-muted-foreground mt-1">{format(new Date(review.createdAt), "PPP")}</p>
                                     <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
                                 </div>
                             ))}

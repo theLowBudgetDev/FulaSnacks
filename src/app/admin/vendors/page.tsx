@@ -16,12 +16,25 @@ import { Store } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { DeleteVendorDialog } from '@/components/admin/DeleteVendorDialog';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminVendorsPage() {
+<<<<<<< HEAD
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
+=======
+    const router = useRouter();
+    const [vendors, setVendors] = useState<Vendor[]>([]);
+    const [totalVendors, setTotalVendors] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    const searchParams = useSearchParams();
+    const currentPage = Number(searchParams.get('page')) || 1;
+
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const { toast } = useToast();
@@ -30,18 +43,30 @@ export default function AdminVendorsPage() {
         // Fetch vendors from API
     }, []);
 
-    const paginatedVendors = useMemo(() => {
-        return vendors.slice(
-            (currentPage - 1) * ITEMS_PER_PAGE,
-            currentPage * ITEMS_PER_PAGE
-        );
-    }, [vendors, currentPage]);
+    useEffect(() => {
+        const fetchVendors = async () => {
+            setLoading(true);
+            const params = new URLSearchParams({
+                page: String(currentPage),
+                limit: String(ITEMS_PER_PAGE),
+            });
+            // const res = await fetch(`/api/admin/vendors?${params.toString()}`);
+            // const data = await res.json();
+            // setVendors(data.vendors);
+            // setTotalVendors(data.total);
+            setLoading(false);
+        };
+        fetchVendors();
+    }, [currentPage]);
     
-    const totalPages = Math.ceil(vendors.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(totalVendors / ITEMS_PER_PAGE);
 
-    const handleApprovalChange = (vendorId: string, isApproved: boolean) => {
+    const handleApprovalChange = async (vendorId: string, isApproved: boolean) => {
+        // API call to update vendor approval
+        // await fetch(`/api/admin/vendors/${vendorId}`, { method: 'PUT', body: JSON.stringify({ isApproved }) });
+        
         setVendors(vendors.map(v => v.id === vendorId ? {...v, isApproved } : v));
-        const vendorName = vendors.find(v => v.id === vendorId)?.name;
+        const vendorName = vendors.find(v => v.id === vendorId)?.user.name;
         toast({
             title: `Vendor ${isApproved ? 'Approved' : 'Suspended'}`,
             description: `${vendorName} has been updated.`,
@@ -53,12 +78,13 @@ export default function AdminVendorsPage() {
         setIsDeleteDialogOpen(true);
     };
 
-    const confirmDeleteVendor = () => {
+    const confirmDeleteVendor = async () => {
         if(selectedVendor) {
+            // await fetch(`/api/admin/vendors/${selectedVendor.id}`, { method: 'DELETE' });
             setVendors(vendors.filter(v => v.id !== selectedVendor.id));
              toast({
                 title: "Vendor Deleted",
-                description: `${selectedVendor.name} has been removed.`,
+                description: `${selectedVendor.user.name} has been removed.`,
             });
         }
         setIsDeleteDialogOpen(false);
@@ -83,18 +109,29 @@ export default function AdminVendorsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedVendors.map(vendor => (
+            {loading ? (
+                Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell colSpan={4}><Skeleton className="h-12 w-full" /></TableCell>
+                    </TableRow>
+                ))
+            ) : vendors.map(vendor => (
                 <TableRow key={vendor.id}>
                     <TableCell className="font-medium flex items-center gap-3">
                         <Avatar>
-                            <AvatarImage src={vendor.logoUrl} alt={vendor.name} />
+                            <AvatarImage src={vendor.logoUrl || ''} alt={vendor.user.name} />
                             <AvatarFallback>
                                 <Store />
                             </AvatarFallback>
                         </Avatar>
                        <div>
+<<<<<<< HEAD
                          {vendor.name}
                          <div className="text-sm text-muted-foreground">{vendor.owner.email}</div>
+=======
+                         {vendor.user.name}
+                         <div className="text-sm text-muted-foreground">{vendor.user.email}</div>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                        </div>
                     </TableCell>
                     <TableCell>{vendor.campusLocation}</TableCell>
@@ -120,7 +157,11 @@ export default function AdminVendorsPage() {
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                     <DropdownMenuItem asChild>
+<<<<<<< HEAD
                                         <Link href={`/vendors/${vendor.id}`} target="_blank">View Storefront</Link>
+=======
+                                        <Link href={`/vendors/${vendor.id}`}>View Storefront</Link>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteVendor(vendor)}>Delete Vendor</DropdownMenuItem>
@@ -144,7 +185,6 @@ export default function AdminVendorsPage() {
         <PaginationComponent 
             totalPages={totalPages}
             currentPage={currentPage}
-            onPageChange={setCurrentPage}
         />
       </CardFooter>
     </Card>
@@ -152,7 +192,7 @@ export default function AdminVendorsPage() {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDeleteVendor}
-        vendorName={selectedVendor?.name}
+        vendorName={selectedVendor?.user.name}
     />
     </>
   );

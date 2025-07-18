@@ -7,12 +7,19 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { PaginationComponent } from '@/components/shared/PaginationComponent';
+<<<<<<< HEAD
 import type { Snack } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+=======
+import { Skeleton } from '@/components/ui/skeleton';
+import type { Snack } from '@/lib/types';
+import { useSearchParams, useRouter } from 'next/navigation';
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
 const ITEMS_PER_PAGE = 8;
 
 export default function AllSnacksPage() {
+<<<<<<< HEAD
   const [allSnacks, setAllSnacks] = useState<Snack[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,15 +51,70 @@ export default function AllSnacksPage() {
     const matchesCategory = category === 'all' || snack.category === category;
     return matchesSearch && matchesCategory;
   }), [allSnacks, searchTerm, category]);
+=======
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [snacks, setSnacks] = useState<Snack[]>([]);
+  const [categories, setCategories] = useState<string[]>(['all']);
+  const [totalSnacks, setTotalSnacks] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const totalPages = Math.ceil(filteredSnacks.length / ITEMS_PER_PAGE);
-  const paginatedSnacks = filteredSnacks.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
-  );
+  const searchTerm = searchParams.get('search') || '';
+  const category = searchParams.get('category') || 'all';
+  const currentPage = Number(searchParams.get('page')) || 1;
+
+  useEffect(() => {
+    const fetchSnacksAndCategories = async () => {
+      setLoading(true);
+      try {
+        const query = new URLSearchParams({
+          search: searchTerm,
+          category: category,
+          page: String(currentPage),
+          limit: String(ITEMS_PER_PAGE),
+        }).toString();
+        
+        // This is a placeholder for an API route you would create
+        // For now, we'll simulate the API call with direct prisma access
+        // In a real app, you would fetch from `/api/snacks?${query}`
+        const res = await fetch(`/api/snacks?${query}`);
+        const data = await res.json();
+        
+        setSnacks(data.snacks);
+        setTotalSnacks(data.total);
+        if (data.categories) {
+            setCategories(['all', ...data.categories]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch snacks", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSnacksAndCategories();
+  }, [searchTerm, category, currentPage]);
+  
+  const totalPages = Math.ceil(totalSnacks / ITEMS_PER_PAGE);
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('search', e.target.value);
+    params.set('page', '1');
+    router.push(`/snacks?${params.toString()}`);
+  }
+
+  const handleCategoryChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('category', value);
+    params.set('page', '1');
+    router.push(`/snacks?${params.toString()}`);
+  }
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    const params = new URLSearchParams(searchParams);
+    params.set('page', String(page));
+    router.push(`/snacks?${params.toString()}`);
     window.scrollTo(0, 0);
   }
 
@@ -76,18 +138,19 @@ export default function AllSnacksPage() {
                     placeholder="Search for snacks..."
                     className="pl-10"
                     value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setCurrentPage(1); // Reset to first page on search
-                    }}
+                    onChange={handleSearchChange}
                 />
             </div>
+<<<<<<< HEAD
             <Select value={category} onValueChange={(value) => {
                 setCategory(value);
                 setCurrentPage(1); // Reset to first page on filter change
             }}
             disabled={loading}
             >
+=======
+            <Select value={category} onValueChange={handleCategoryChange}>
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                 <SelectTrigger className="w-full md:w-[200px]">
                     <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -100,6 +163,7 @@ export default function AllSnacksPage() {
         </div>
 
         {loading ? (
+<<<<<<< HEAD
            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
              {[...Array(8)].map((_, i) => (
                 <div key={i} className="flex flex-col space-y-3">
@@ -112,8 +176,22 @@ export default function AllSnacksPage() {
              ))}
            </div>
         ) : paginatedSnacks.length > 0 ? (
+=======
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {paginatedSnacks.map((snack) => (
+                {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                    <div key={i} className="space-y-3">
+                        <Skeleton className="h-[170px] w-full rounded-xl" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        ) : snacks.length > 0 ? (
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {snacks.map((snack) => (
                     <SnackCard key={snack.id} snack={snack} />
                 ))}
             </div>

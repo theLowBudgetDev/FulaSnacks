@@ -1,9 +1,14 @@
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SnackCard from "@/components/shared/SnackCard";
 import VendorCard from "@/components/shared/VendorCard";
+<<<<<<< HEAD
 import prisma from "@/lib/prisma";
+=======
+import { prisma } from "@/lib/prisma";
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
 export default async function Home() {
   const featuredSnacks = await prisma.snack.findMany({
@@ -14,6 +19,7 @@ export default async function Home() {
       },
     },
     include: {
+<<<<<<< HEAD
         reviews: {
             include: {
                 user: true,
@@ -29,10 +35,15 @@ export default async function Home() {
                 owner: true,
             }
         }
+=======
+      vendor: { include: { user: true } },
+      reviews: { include: { user: true } },
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
     },
   });
 
   const vendors = await prisma.vendor.findMany({
+<<<<<<< HEAD
     take: 3,
     where: { isApproved: true },
      include: {
@@ -44,6 +55,22 @@ export default async function Home() {
         owner: true,
     }
   });
+=======
+    where: { isApproved: true },
+    take: 3,
+    orderBy: {
+      user: {
+        name: 'asc'
+      }
+    },
+    include: {
+      user: true,
+      products: true,
+      // Cannot include reviews directly on vendor, need to aggregate from snacks
+    }
+  });
+
+>>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   return (
     <div className="flex flex-col">

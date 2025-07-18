@@ -78,7 +78,7 @@ export default function SnackCard({ snack }: SnackCardProps) {
         <CardDescription className="text-sm">
           From{' '}
           <Link href={`/vendors/${vendor?.id}`} className="text-primary hover:underline">
-            {vendor?.name}
+            {vendor?.user.name}
           </Link>
         </CardDescription>
         <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{snack.description}</p>
