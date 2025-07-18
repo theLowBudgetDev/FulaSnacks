@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -9,6 +10,7 @@ import {
   LayoutGrid,
   LogOut,
   ShoppingBag as ShoppingBagIcon,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -38,7 +40,6 @@ export default function Header() {
   const { cart } = useCart();
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // For demonstration, we'll simulate a logged-in user state
   const isLoggedIn = true; 
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
@@ -128,6 +129,9 @@ export default function Header() {
                     <>
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                           <Link href="/profile"><User className="mr-2 h-4 w-4" />Profile</Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                             <Link href="/orders"><ShoppingBagIcon className="mr-2 h-4 w-4" />My Orders</Link>
                         </DropdownMenuItem>

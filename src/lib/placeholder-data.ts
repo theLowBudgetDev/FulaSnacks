@@ -1,4 +1,12 @@
-import type { Snack, Vendor, Order } from './types';
+
+import type { Snack, Vendor, Order, Review } from './types';
+
+const reviews: Review[] = [
+    { id: 'rev-1', userId: 'user-123', userName: 'Jane Doe', rating: 5, comment: 'Absolutely delicious! Best meat pie on campus.', date: '2023-10-20' },
+    { id: 'rev-2', userId: 'user-456', userName: 'John Smith', rating: 4, comment: 'Very tasty, but could be a bit bigger for the price.', date: '2023-10-21' },
+    { id: 'rev-3', userId: 'user-789', userName: 'Ada Lovelace', rating: 5, comment: 'The puff-puff is always fresh and fluffy.', date: '2023-10-22' },
+];
+
 
 export const vendors: Vendor[] = [
   {
@@ -7,6 +15,7 @@ export const vendors: Vendor[] = [
     description: 'Serving the best home-style Nigerian snacks on campus. From puff-puff to meat pie, we have it all!',
     logoUrl: 'https://placehold.co/400x400.png',
     campusLocation: 'Faculty of Arts Complex',
+    reviews: reviews.slice(0,2),
   },
   {
     id: 'vendor-2',
@@ -14,6 +23,7 @@ export const vendors: Vendor[] = [
     description: 'Freshly squeezed juices and healthy smoothies to keep you refreshed and energized throughout the day.',
     logoUrl: 'https://placehold.co/400x400.png',
     campusLocation: 'University Library Entrance',
+    reviews: [reviews[2]],
   },
   {
     id: 'vendor-3',
@@ -21,6 +31,7 @@ export const vendors: Vendor[] = [
     description: 'Hot and spicy grilled chicken, beef, and fish. The perfect treat after a long day of lectures.',
     logoUrl: 'https://placehold.co/400x400.png',
     campusLocation: 'Student Union Building (SUB)',
+    reviews: [],
   },
 ];
 
@@ -33,6 +44,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-1',
     category: 'Pastries',
+    reviews: reviews.slice(0, 2),
   },
   {
     id: 'snack-2',
@@ -42,6 +54,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-1',
     category: 'Pastries',
+    reviews: [reviews[2]],
   },
   {
     id: 'snack-3',
@@ -51,6 +64,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-1',
     category: 'Small Chops',
+    reviews: [],
   },
   {
     id: 'snack-4',
@@ -60,6 +74,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-1',
     category: 'Pastries',
+    reviews: [],
   },
   {
     id: 'snack-5',
@@ -69,6 +84,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-2',
     category: 'Drinks',
+    reviews: [],
   },
   {
     id: 'snack-6',
@@ -78,6 +94,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-2',
     category: 'Drinks',
+    reviews: [],
   },
   {
     id: 'snack-7',
@@ -87,6 +104,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-2',
     category: 'Drinks',
+    reviews: [],
   },
   {
     id: 'snack-8',
@@ -96,6 +114,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-3',
     category: 'Grills',
+    reviews: [],
   },
   {
     id: 'snack-9',
@@ -105,6 +124,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-3',
     category: 'Grills',
+    reviews: [],
   },
   {
     id: 'snack-10',
@@ -114,6 +134,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-1',
     category: 'Pastries',
+    reviews: [],
   },
   {
     id: 'snack-11',
@@ -123,6 +144,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-2',
     category: 'Drinks',
+    reviews: [],
   },
   {
     id: 'snack-12',
@@ -132,6 +154,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-3',
     category: 'Grills',
+    reviews: [],
   },
    {
     id: 'snack-13',
@@ -141,6 +164,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-2',
     category: 'Beverages',
+    reviews: [],
   },
   {
     id: 'snack-14',
@@ -150,6 +174,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-2',
     category: 'Beverages',
+    reviews: [],
   },
    {
     id: 'snack-15',
@@ -159,6 +184,7 @@ export const allSnacks: Snack[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     vendorId: 'vendor-2',
     category: 'Beverages',
+    reviews: [],
   },
 ];
 

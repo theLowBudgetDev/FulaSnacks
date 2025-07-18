@@ -1,3 +1,13 @@
+
+export interface Review {
+  id: string;
+  userId: string;
+  userName: string;
+  rating: number; // 1 to 5
+  comment: string;
+  date: string;
+}
+
 export interface Snack {
   id: string;
   name: string;
@@ -6,6 +16,7 @@ export interface Snack {
   imageUrl: string;
   vendorId: string;
   category: string;
+  reviews: Review[];
 }
 
 export interface Vendor {
@@ -14,6 +25,7 @@ export interface Vendor {
   description: string;
   logoUrl: string;
   campusLocation: string;
+  reviews: Review[];
 }
 
 export interface CartItem {

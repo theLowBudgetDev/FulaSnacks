@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Suspense } from 'react';
@@ -7,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/context/CartContext';
 import { CheckCircle, CreditCard } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 
 function PaymentComponent() {
   const router = useRouter();
@@ -17,7 +17,6 @@ function PaymentComponent() {
   const amount = searchParams.get('amount') || '0';
 
   const handleConfirmPayment = () => {
-    // In a real app, this would be the callback from a payment provider
     toast({
       title: "Payment Successful!",
       description: "Your order has been placed.",

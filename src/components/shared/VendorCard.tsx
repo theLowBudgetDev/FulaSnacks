@@ -1,18 +1,21 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import type { Vendor } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, Star } from "lucide-react";
 
 interface VendorCardProps {
   vendor: Vendor;
 }
 
 export default function VendorCard({ vendor }: VendorCardProps) {
+  const averageRating = vendor.reviews.reduce((acc, review) => acc + review.rating, 0) / vendor.reviews.length;
+  
   return (
     <Link href={`/vendors/${vendor.id}`}>
       <Card className="group flex flex-col h-full overflow-hidden transition-all hover:shadow-lg hover:border-primary">
-        <CardHeader className="flex flex-row items-center gap-4">
+        <CardHeader className="flex flex-row items-start gap-4">
           <Image
             src={vendor.logoUrl}
             alt={`${vendor.name} logo`}
@@ -28,6 +31,12 @@ export default function VendorCard({ vendor }: VendorCardProps) {
               {vendor.campusLocation}
             </CardDescription>
           </div>
+           {vendor.reviews.length > 0 && (
+                <div className="flex items-center gap-1 text-sm font-medium text-amber-500 shrink-0">
+                    <Star className="h-4 w-4 fill-current" />
+                    <span>{averageRating.toFixed(1)} ({vendor.reviews.length})</span>
+                </div>
+            )}
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="text-muted-foreground text-sm line-clamp-3">

@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,11 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, Trash2, Plus, Minus } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { PaymentDialog } from "@/components/shared/PaymentDialog";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -22,7 +26,7 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     if (cart.length > 0) {
-      router.push(`/payment?amount=${total}`);
+      setIsPaymentDialogOpen(true);
     } else {
       toast({
         variant: 'destructive',
@@ -31,8 +35,18 @@ export default function CartPage() {
       });
     }
   };
+  
+  const handlePaymentSuccess = () => {
+     toast({
+      title: "Payment Successful!",
+      description: "Your order has been placed.",
+    });
+    clearCart();
+    router.push('/orders');
+  }
 
   return (
+    <>
     <div className="container mx-auto px-4 py-16">
       <div className="mb-12 text-center">
         <h1 className="font-headline text-4xl font-bold tracking-tight md:text-5xl">
@@ -132,5 +146,13 @@ export default function CartPage() {
         </div>
       )}
     </div>
+    <PaymentDialog
+      open={isPaymentDialogOpen}
+      onOpenChange={setIsPaymentDialogOpen}
+      onConfirm={handlePaymentSuccess}
+      amount={total}
+    />
+    </>
   );
 }
+

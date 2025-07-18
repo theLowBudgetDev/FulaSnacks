@@ -1,8 +1,11 @@
+
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { vendors, allSnacks } from '@/lib/placeholder-data';
 import SnackCard from '@/components/shared/SnackCard';
-import { MapPin } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 export default function VendorDetailPage({ params }: { params: { id: string } }) {
   const vendor = vendors.find((v) => v.id === params.id);
@@ -11,6 +14,9 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
   if (!vendor) {
     notFound();
   }
+  
+  const averageRating = vendor.reviews.reduce((acc, review) => acc + review.rating, 0) / vendor.reviews.length;
+
 
   return (
     <div>
@@ -28,9 +34,20 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
             <div className="text-center md:text-left">
               <h1 className="font-headline text-4xl font-bold md:text-5xl">{vendor.name}</h1>
               <p className="mt-2 text-lg text-muted-foreground max-w-2xl">{vendor.description}</p>
-              <div className="mt-4 flex items-center justify-center md:justify-start gap-2 text-muted-foreground">
-                <MapPin className="h-5 w-5" />
-                <span>{vendor.campusLocation}</span>
+              <div className="mt-4 flex items-center justify-center md:justify-start gap-4 text-muted-foreground">
+                <div className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    <span>{vendor.campusLocation}</span>
+                </div>
+                {vendor.reviews.length > 0 && (
+                 <>
+                    <Separator orientation="vertical" className="h-5"/>
+                    <div className="flex items-center gap-1.5 text-amber-500 font-medium">
+                        <Star className="h-5 w-5 fill-current" />
+                        <span>{averageRating.toFixed(1)} ({vendor.reviews.length} reviews)</span>
+                    </div>
+                 </>
+                )}
               </div>
             </div>
           </div>
@@ -39,18 +56,48 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
 
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <h2 className="font-headline text-3xl font-bold text-center mb-12">
-            Snacks from {vendor.name}
-          </h2>
-          {snacks.length > 0 ? (
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {snacks.map((snack) => (
-                <SnackCard key={snack.id} snack={snack} />
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div className="md:col-span-3">
+                <h2 className="font-headline text-3xl font-bold mb-8">
+                    Snacks from {vendor.name}
+                </h2>
+                {snacks.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    {snacks.map((snack) => (
+                        <SnackCard key={snack.id} snack={snack} />
+                    ))}
+                    </div>
+                ) : (
+                    <p className="text-center text-muted-foreground">This vendor currently has no snacks available.</p>
+                )}
             </div>
-          ) : (
-            <p className="text-center text-muted-foreground">This vendor currently has no snacks available.</p>
-          )}
+            <div className="md:col-span-1">
+                 <h2 className="font-headline text-3xl font-bold mb-8">
+                    Reviews
+                </h2>
+                {vendor.reviews.length > 0 ? (
+                    <Card>
+                        <CardContent className="p-6 space-y-6">
+                            {vendor.reviews.map(review => (
+                                <div key={review.id}>
+                                    <div className="flex items-center justify-between">
+                                        <p className="font-semibold">{review.userName}</p>
+                                        <div className="flex items-center gap-1 text-amber-500">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'fill-current' : ''}`} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+                ) : (
+                     <p className="text-muted-foreground">No reviews for this vendor yet.</p>
+                )}
+            </div>
+          </div>
         </div>
       </section>
     </div>

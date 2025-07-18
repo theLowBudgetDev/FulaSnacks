@@ -1,21 +1,24 @@
+
 "use client";
 
 import { useState } from "react";
-import type { Order } from "@/lib/types";
+import type { Order, Snack } from "@/lib/types";
 import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText } from "lucide-react";
+import { FileText, MessageSquare } from "lucide-react";
 import { OrderDetailDialog } from "@/components/shared/OrderDetailDialog";
 import { PaginationComponent } from "@/components/shared/PaginationComponent";
+import { ReviewDialog } from "@/components/shared/ReviewDialog";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [reviewSnack, setReviewSnack] = useState<Snack | null>(null);
   const [activePage, setActivePage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
 
@@ -54,6 +57,12 @@ export default function OrdersPage() {
         return 'outline';
     }
   };
+  
+  const handleReview = (snack: Snack) => {
+    setReviewSnack(snack);
+    setSelectedOrder(null);
+  };
+
 
   const OrderTable = ({ orders, totalPages, currentPage, onPageChange }: { orders: typeof userOrders, totalPages: number, currentPage: number, onPageChange: (page: number) => void }) => (
     <Card>
@@ -83,6 +92,12 @@ export default function OrdersPage() {
                       <FileText className="h-4 w-4 mr-2" />
                       View Details
                     </Button>
+                     {order.status === 'Completed' && (
+                       <Button variant="ghost" size="sm" onClick={() => handleReview(order.items[0].snack)}>
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Leave Review
+                       </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -144,6 +159,17 @@ export default function OrdersPage() {
           }}
         />
       )}
+       {reviewSnack && (
+        <ReviewDialog 
+            snack={reviewSnack}
+            open={!!reviewSnack}
+            onOpenChange={(isOpen) => {
+                if(!isOpen) {
+                    setReviewSnack(null);
+                }
+            }}
+        />
+       )}
     </>
   );
 }
