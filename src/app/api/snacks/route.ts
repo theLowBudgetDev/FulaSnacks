@@ -15,6 +15,9 @@ export async function GET(req: Request) {
         contains: searchTerm,
         mode: 'insensitive',
       },
+      vendor: {
+        isApproved: true,
+      }
     };
 
     if (category !== 'all') {
@@ -44,13 +47,16 @@ export async function GET(req: Request) {
 
     const total = await prisma.snack.count({ where });
     
-    const categoryResults = await prisma.snack.findMany({
-      select: {
-        category: true,
-      },
-      distinct: ['category'],
+    const categoryResults = await prisma.snack.groupBy({
+      by: ['category'],
+       where: {
+          vendor: {
+            isApproved: true
+          }
+       }
     });
     const categories = categoryResults.map(c => c.category);
+
 
     return NextResponse.json({
       snacks,

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 
 export default function AdminLoginPage() {
