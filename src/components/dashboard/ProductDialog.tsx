@@ -13,8 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 interface ProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (productData: Omit<Snack, 'id' | 'vendorId'>) => void;
-  product: Snack | null;
+  onSave: (productData: Omit<Snack, 'id' | 'vendorId' | 'reviews' | 'vendor'>) => void;
+  product: Omit<Snack, 'reviews' | 'vendor'> | null;
 }
 
 export function ProductDialog({ open, onOpenChange, onSave, product }: ProductDialogProps) {

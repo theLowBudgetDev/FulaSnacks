@@ -1,9 +1,10 @@
+
+
 "use client";
 
 import Image from "next/image";
 import type { Order } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -24,13 +25,13 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'Preparing':
+      case 'PREPARING':
         return 'secondary';
-      case 'Ready for Pickup':
+      case 'READY_FOR_PICKUP':
         return 'default';
-      case 'Completed':
+      case 'COMPLETED':
         return 'outline';
-      case 'Cancelled':
+      case 'CANCELLED':
         return 'destructive';
       default:
         return 'outline';
@@ -39,36 +40,36 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-        case 'Preparing':
+        case 'PREPARING':
             return <Clock className="h-4 w-4" />;
-        case 'Ready for Pickup':
+        case 'READY_FOR_PICKUP':
             return <Truck className="h-4 w-4" />;
-        case 'Completed':
+        case 'COMPLETED':
             return <CheckCircle className="h-4 w-4 text-green-500" />;
-        case 'Cancelled':
+        case 'CANCELLED':
             return <XCircle className="h-4 w-4" />;
         default:
             return <Clock className="h-4 w-4" />;
     }
   }
   
-  const subtotal = order.items.reduce((acc, item) => acc + item.snack.price * item.quantity, 0);
+  const subtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const deliveryFee = 200; // Assuming a fixed delivery fee
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle>Order {order.id}</DialogTitle>
+          <DialogTitle>Order {order.id.substring(0,8)}...</DialogTitle>
           <DialogDescription>
-            Placed on {new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            Placed on {new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
             <div className="flex items-center gap-3">
                 <Badge variant={getStatusVariant(order.status) as any} className="flex items-center gap-2 pl-2 pr-3 py-1 text-sm">
                     {getStatusIcon(order.status)}
-                    {order.status}
+                    {order.status.replace('_', ' ')}
                 </Badge>
             </div>
           <div className="flex flex-col gap-4 max-h-60 overflow-y-auto pr-4">

@@ -1,53 +1,35 @@
+import type {Snack as PrismaSnack, Vendor as PrismaVendor, Order as PrismaOrder, Review as PrismaReview, User as PrismaUser, OrderItem as PrismaOrderItem } from '@prisma/client';
 
-export interface Review {
-  id: string;
-  userId: string;
-  userName: string;
-  rating: number; // 1 to 5
-  comment: string;
-  date: string;
-}
+export type Review = PrismaReview & {
+    user: PrismaUser;
+};
 
-export interface Snack {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  vendorId: string;
-  category: string;
+export type Snack = PrismaSnack & {
+    reviews: Review[];
+    vendor: PrismaVendor;
+};
+
+export type Vendor = PrismaVendor & {
   reviews: Review[];
-}
-
-export interface Vendor {
-  id: string;
-  name: string;
-  description: string;
-  logoUrl: string;
-  campusLocation: string;
-  reviews: Review[];
-  isApproved: boolean;
-}
+  owner: PrismaUser;
+};
 
 export interface CartItem {
   snack: Snack;
   quantity: number;
 }
 
-export interface Order {
-  id: string;
-  userId: string;
-  items: CartItem[];
-  total: number;
-  status: 'Placed' | 'Preparing' | 'Ready for Pickup' | 'Completed' | 'Cancelled';
-  orderDate: string;
+export type OrderItem = PrismaOrderItem & {
+    snack: Snack;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatarUrl: string;
-  role: 'customer' | 'vendor' | 'admin';
-  createdAt: string;
+export type Order = PrismaOrder & {
+    items: OrderItem[];
+    user: PrismaUser;
+};
+
+export type User = PrismaUser & {
+    orders: Order[];
+    reviews: Review[];
+    vendor?: Vendor | null;
 }

@@ -1,9 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { allSnacks } from "@/lib/placeholder-data";
 import type { Snack } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,11 +17,15 @@ import { PaginationComponent } from "@/components/shared/PaginationComponent";
 const ITEMS_PER_PAGE = 5;
 
 export default function VendorProductsPage() {
-    const [products, setProducts] = useState<Snack[]>(allSnacks.filter(snack => snack.vendorId === 'vendor-1'));
+    const [products, setProducts] = useState<Snack[]>([]);
     const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Snack | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
+    
+    useEffect(() => {
+        // fetch products for the logged in vendor
+    }, []);
 
     const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
     const paginatedProducts = products.slice(
@@ -45,18 +48,18 @@ export default function VendorProductsPage() {
         setIsDeleteDialogOpen(true);
     };
 
-    const handleSaveProduct = (productData: Omit<Snack, 'id' | 'vendorId'>) => {
+    const handleSaveProduct = (productData: Omit<Snack, 'id' | 'vendorId' | 'reviews' | 'vendor'>) => {
         if (selectedProduct) {
             // Edit existing product
-            setProducts(products.map(p => p.id === selectedProduct.id ? { ...selectedProduct, ...productData } : p));
+            // setProducts(products.map(p => p.id === selectedProduct.id ? { ...selectedProduct, ...productData } : p));
         } else {
             // Add new product
-            const newProduct: Snack = {
-                id: `snack-${Date.now()}`,
-                ...productData,
-                vendorId: 'vendor-1' // Assuming a static vendor for now
-            };
-            setProducts([newProduct, ...products]);
+            // const newProduct: Snack = {
+            //     id: `snack-${Date.now()}`,
+            //     ...productData,
+            //     vendorId: 'vendor-1' // Assuming a static vendor for now
+            // };
+            // setProducts([newProduct, ...products]);
         }
     };
     
@@ -133,6 +136,13 @@ export default function VendorProductsPage() {
                     </TableCell>
                 </TableRow>
             ))}
+             {paginatedProducts.length === 0 && (
+                <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                        No products found. Add one to get started.
+                    </TableCell>
+                </TableRow>
+             )}
           </TableBody>
         </Table>
       </CardContent>

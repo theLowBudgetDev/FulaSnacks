@@ -22,9 +22,9 @@ export function UserProfileDialog({ user, open, onOpenChange }: UserProfileDialo
 
   const getRoleVariant = (role: string) => {
     switch (role) {
-        case 'admin': return 'destructive';
-        case 'vendor': return 'default';
-        case 'customer': return 'secondary';
+        case 'ADMIN': return 'destructive';
+        case 'VENDOR': return 'default';
+        case 'CUSTOMER': return 'secondary';
         default: return 'outline';
     }
   };

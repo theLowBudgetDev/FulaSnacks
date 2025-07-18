@@ -1,21 +1,66 @@
-
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { vendors, allSnacks } from '@/lib/placeholder-data';
+import prisma from '@/lib/prisma';
 import SnackCard from '@/components/shared/SnackCard';
 import { MapPin, Star } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-export default function VendorDetailPage({ params }: { params: { id: string } }) {
-  const vendor = vendors.find((v) => v.id === params.id);
-  const snacks = allSnacks.filter((s) => s.vendorId === params.id);
+export default async function VendorDetailPage({ params }: { params: { id: string } }) {
+  const vendor = await prisma.vendor.findUnique({
+    where: { id: params.id, isApproved: true },
+    include: {
+      products: {
+        include: {
+          reviews: {
+            include: {
+              user: true,
+            },
+          },
+          vendor: {
+            include: {
+              reviews: {
+                include: {
+                  user: true,
+                },
+              },
+              owner: true,
+            },
+          },
+        },
+      },
+      reviews: {
+        include: {
+          user: true,
+        },
+      },
+      owner: true,
+    },
+  });
 
   if (!vendor) {
     notFound();
   }
   
-  const averageRating = vendor.reviews.reduce((acc, review) => acc + review.rating, 0) / vendor.reviews.length;
+  const snacks = vendor.products;
+
+  const allReviews = await prisma.review.findMany({
+    where: {
+      snack: {
+        vendorId: vendor.id,
+      },
+    },
+    include: {
+        user: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    }
+  });
+  
+  const averageRating = allReviews.length > 0
+    ? allReviews.reduce((acc, review) => acc + review.rating, 0) / allReviews.length
+    : 0;
 
 
   return (
@@ -39,12 +84,12 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
                     <MapPin className="h-5 w-5" />
                     <span>{vendor.campusLocation}</span>
                 </div>
-                {vendor.reviews.length > 0 && (
+                {allReviews.length > 0 && (
                  <>
                     <Separator orientation="vertical" className="h-5"/>
                     <div className="flex items-center gap-1.5 text-amber-500 font-medium">
                         <Star className="h-5 w-5 fill-current" />
-                        <span>{averageRating.toFixed(1)} ({vendor.reviews.length} reviews)</span>
+                        <span>{averageRating.toFixed(1)} ({allReviews.length} reviews)</span>
                     </div>
                  </>
                 )}
@@ -75,13 +120,13 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
                  <h2 className="font-headline text-3xl font-bold mb-8">
                     Reviews
                 </h2>
-                {vendor.reviews.length > 0 ? (
+                {allReviews.length > 0 ? (
                     <Card>
                         <CardContent className="p-6 space-y-6">
-                            {vendor.reviews.map(review => (
+                            {allReviews.slice(0, 5).map(review => (
                                 <div key={review.id}>
                                     <div className="flex items-center justify-between">
-                                        <p className="font-semibold">{review.userName}</p>
+                                        <p className="font-semibold">{review.user.name}</p>
                                         <div className="flex items-center gap-1 text-amber-500">
                                             {[...Array(5)].map((_, i) => (
                                                 <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'fill-current' : ''}`} />

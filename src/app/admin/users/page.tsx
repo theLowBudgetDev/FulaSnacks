@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
-import { allUsers } from "@/lib/placeholder-data";
+import { useState, useMemo, useEffect } from 'react';
 import type { User } from '@/lib/types';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,11 +15,13 @@ import { useToast } from '@/hooks/use-toast';
 import { UserProfileDialog } from '@/components/admin/UserProfileDialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminUsersPage() {
-    const [users, setUsers] = useState<User[]>(allUsers);
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
@@ -28,13 +29,24 @@ export default function AdminUsersPage() {
     const [roleFilter, setRoleFilter] = useState('all');
     const { toast } = useToast();
 
+    useEffect(() => {
+        async function fetchUsers() {
+            setLoading(true);
+            // const response = await fetch('/api/admin/users');
+            // const data = await response.json();
+            // setUsers(data);
+            setLoading(false);
+        }
+        fetchUsers();
+    }, []);
+
     const filteredUsers = useMemo(() => {
-        return allUsers.filter(user => {
+        return users.filter(user => {
             const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+            const matchesRole = roleFilter === 'all' || user.role.toLowerCase() === roleFilter;
             return matchesSearch && matchesRole;
         });
-    }, [searchTerm, roleFilter]);
+    }, [users, searchTerm, roleFilter]);
 
     const paginatedUsers = useMemo(() => {
         return filteredUsers.slice(
@@ -47,9 +59,9 @@ export default function AdminUsersPage() {
     
     const getRoleVariant = (role: string) => {
         switch (role) {
-            case 'admin': return 'destructive';
-            case 'vendor': return 'default';
-            case 'customer': return 'secondary';
+            case 'ADMIN': return 'destructive';
+            case 'VENDOR': return 'default';
+            case 'CUSTOMER': return 'secondary';
             default: return 'outline';
         }
     };
@@ -124,7 +136,18 @@ export default function AdminUsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedUsers.map(user => (
+            {loading ? (
+                [...Array(ITEMS_PER_PAGE)].map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell><Skeleton className="h-10 w-40" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-32" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                    </TableRow>
+                ))
+            ) : paginatedUsers.length > 0 ? (
+                paginatedUsers.map(user => (
                 <TableRow key={user.id}>
                     <TableCell className="font-medium flex items-center gap-3">
                         <Avatar>
@@ -158,8 +181,8 @@ export default function AdminUsersPage() {
                         </DropdownMenu>
                     </TableCell>
                 </TableRow>
-            ))}
-             {paginatedUsers.length === 0 && (
+            ))
+            ) : (
                 <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                         No users found.

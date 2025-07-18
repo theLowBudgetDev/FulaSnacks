@@ -1,9 +1,9 @@
 
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Order, Snack } from "@/lib/types";
-import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -17,17 +17,42 @@ import { ReviewDialog } from "@/components/shared/ReviewDialog";
 const ITEMS_PER_PAGE = 10;
 
 export default function OrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [reviewSnack, setReviewSnack] = useState<Snack | null>(null);
   const [activePage, setActivePage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
 
+  useEffect(() => {
+    async function fetchOrders() {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/orders');
+        if (response.ok) {
+          const data = await response.json();
+          setOrders(data);
+        } else {
+          console.error("Failed to fetch orders");
+          setOrders([]);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchOrders();
+  }, []);
 
-  const activeOrders = userOrders.filter(
-    (order) => order.status === "Preparing" || order.status === "Ready for Pickup"
+
+  const activeOrders = orders.filter(
+    (order) => order.status === "PREPARING" || order.status === "READY_FOR_PICKUP"
   );
-  const pastOrders = userOrders.filter(
-    (order) => order.status === "Completed" || order.status === "Cancelled"
+  const pastOrders = orders.filter(
+    (order) => order.status === "COMPLETED" || order.status === "CANCELLED"
   );
 
   const activeTotalPages = Math.ceil(activeOrders.length / ITEMS_PER_PAGE);
@@ -45,13 +70,13 @@ export default function OrdersPage() {
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'Preparing':
+      case 'PREPARING':
         return 'secondary';
-      case 'Ready for Pickup':
+      case 'READY_FOR_PICKUP':
         return 'default';
-      case 'Completed':
+      case 'COMPLETED':
         return 'outline';
-      case 'Cancelled':
+      case 'CANCELLED':
         return 'destructive';
       default:
         return 'outline';
@@ -59,12 +84,13 @@ export default function OrdersPage() {
   };
   
   const handleReview = (snack: Snack) => {
+    if(!snack) return;
     setReviewSnack(snack);
     setSelectedOrder(null);
   };
 
 
-  const OrderTable = ({ orders, totalPages, currentPage, onPageChange }: { orders: typeof userOrders, totalPages: number, currentPage: number, onPageChange: (page: number) => void }) => (
+  const OrderTable = ({ orders, totalPages, currentPage, onPageChange }: { orders: Order[], totalPages: number, currentPage: number, onPageChange: (page: number) => void }) => (
     <Card>
       <CardContent className="p-0">
         <Table>
@@ -81,10 +107,10 @@ export default function OrdersPage() {
             {orders.length > 0 ? (
               orders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id}</TableCell>
-                  <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
+                  <TableCell className="font-medium">{order.id.substring(0, 8)}...</TableCell>
+                  <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(order.status) as any}>{order.status}</Badge>
+                    <Badge variant={getStatusVariant(order.status) as any}>{order.status.replace('_', ' ')}</Badge>
                   </TableCell>
                   <TableCell className="text-right">₦{order.total.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
@@ -92,8 +118,8 @@ export default function OrdersPage() {
                       <FileText className="h-4 w-4 mr-2" />
                       View Details
                     </Button>
-                     {order.status === 'Completed' && (
-                       <Button variant="ghost" size="sm" onClick={() => handleReview(order.items[0].snack)}>
+                     {order.status === 'COMPLETED' && (
+                       <Button variant="ghost" size="sm" onClick={() => handleReview(order.items[0]?.snack)}>
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Leave Review
                        </Button>

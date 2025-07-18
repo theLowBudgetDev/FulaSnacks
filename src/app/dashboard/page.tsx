@@ -17,12 +17,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   DollarSign,
   ShoppingBag,
   Package,
-  ArrowUpRight,
 } from "lucide-react";
 import {
   Bar,
@@ -31,8 +29,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import Link from "next/link";
-import { userOrders } from "@/lib/placeholder-data";
+import type { Order } from "@/lib/types";
 
 const salesData = [
   { name: "Mon", total: Math.floor(Math.random() * 5000) + 1000 },
@@ -46,21 +43,23 @@ const salesData = [
 
 const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'Preparing':
+      case 'PREPARING':
         return 'secondary';
-      case 'Ready for Pickup':
+      case 'READY_FOR_PICKUP':
         return 'default';
-      case 'Completed':
+      case 'COMPLETED':
         return 'outline';
-      case 'Cancelled':
+      case 'CANCELLED':
         return 'destructive';
       default:
         return 'outline';
     }
 };
 
+// Mock data, will be replaced by API calls
+const recentOrders: Order[] = [];
+
 export default function DashboardPage() {
-  const recentOrders = userOrders.filter(order => order.items.some(item => item.snack.vendorId === 'vendor-1')).slice(0, 5);
 
   return (
     <div className="flex flex-col gap-6">
@@ -165,9 +164,9 @@ export default function DashboardPage() {
                     {recentOrders.map((order) => (
                         <TableRow key={order.id}>
                             <TableCell>
-                                <div className="font-medium">Customer</div>
+                                <div className="font-medium">{order.user.name}</div>
                                 <div className="hidden text-sm text-muted-foreground md:inline">
-                                    {order.id}
+                                    {order.user.email}
                                 </div>
                             </TableCell>
                             <TableCell>

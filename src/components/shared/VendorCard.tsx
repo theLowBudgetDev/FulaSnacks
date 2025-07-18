@@ -10,7 +10,7 @@ interface VendorCardProps {
 }
 
 export default function VendorCard({ vendor }: VendorCardProps) {
-  const averageRating = vendor.reviews.reduce((acc, review) => acc + review.rating, 0) / vendor.reviews.length;
+  const averageRating = vendor.reviews.length > 0 ? vendor.reviews.reduce((acc, review) => acc + review.rating, 0) / vendor.reviews.length : 0;
   
   return (
     <Link href={`/vendors/${vendor.id}`}>

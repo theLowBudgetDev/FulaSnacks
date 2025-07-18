@@ -1,9 +1,8 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { vendors as initialVendors } from "@/lib/placeholder-data";
 import type { Vendor } from '@/lib/types';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,11 +20,15 @@ import { DeleteVendorDialog } from '@/components/admin/DeleteVendorDialog';
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminVendorsPage() {
-    const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
+    const [vendors, setVendors] = useState<Vendor[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const { toast } = useToast();
+    
+    useEffect(() => {
+        // Fetch vendors from API
+    }, []);
 
     const paginatedVendors = useMemo(() => {
         return vendors.slice(
@@ -91,7 +94,7 @@ export default function AdminVendorsPage() {
                         </Avatar>
                        <div>
                          {vendor.name}
-                         <div className="text-sm text-muted-foreground">{vendor.id}</div>
+                         <div className="text-sm text-muted-foreground">{vendor.owner.email}</div>
                        </div>
                     </TableCell>
                     <TableCell>{vendor.campusLocation}</TableCell>
@@ -117,10 +120,7 @@ export default function AdminVendorsPage() {
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard">View Dashboard</Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/products">View Products</Link>
+                                        <Link href={`/vendors/${vendor.id}`} target="_blank">View Storefront</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteVendor(vendor)}>Delete Vendor</DropdownMenuItem>
@@ -130,6 +130,13 @@ export default function AdminVendorsPage() {
                     </TableCell>
                 </TableRow>
             ))}
+             {paginatedVendors.length === 0 && (
+                <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center">
+                        No vendors found.
+                    </TableCell>
+                </TableRow>
+             )}
           </TableBody>
         </Table>
       </CardContent>

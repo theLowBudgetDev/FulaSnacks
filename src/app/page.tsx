@@ -3,9 +3,48 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SnackCard from "@/components/shared/SnackCard";
 import VendorCard from "@/components/shared/VendorCard";
-import { featuredSnacks, vendors } from "@/lib/placeholder-data";
+import prisma from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  const featuredSnacks = await prisma.snack.findMany({
+    take: 4,
+    orderBy: {
+      reviews: {
+        _count: 'desc',
+      },
+    },
+    include: {
+        reviews: {
+            include: {
+                user: true,
+            }
+        },
+        vendor: {
+            include: {
+                reviews: {
+                    include: {
+                        user: true,
+                    }
+                },
+                owner: true,
+            }
+        }
+    },
+  });
+
+  const vendors = await prisma.vendor.findMany({
+    take: 3,
+    where: { isApproved: true },
+     include: {
+        reviews: {
+            include: {
+                user: true,
+            }
+        },
+        owner: true,
+    }
+  });
+
   return (
     <div className="flex flex-col">
       <section className="bg-card py-20 md:py-32">
@@ -18,7 +57,7 @@ export default function Home() {
           </p>
           <div className="mt-8 flex justify-start gap-4">
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link href="#featured-snacks">
+              <Link href="/snacks">
                 Order Now <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -61,7 +100,7 @@ export default function Home() {
             Our Campus Vendors
           </h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {vendors.slice(0, 3).map((vendor) => (
+            {vendors.map((vendor) => (
               <VendorCard key={vendor.id} vendor={vendor} />
             ))}
           </div>

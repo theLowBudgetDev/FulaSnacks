@@ -4,7 +4,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Snack } from "@/lib/types";
-import { vendors } from "@/lib/placeholder-data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Heart, Star } from "lucide-react";
@@ -21,7 +20,7 @@ export default function SnackCard({ snack }: SnackCardProps) {
   const { toast } = useToast();
   const { addToCart } = useCart();
   const { favorites, toggleFavorite } = useFavorites();
-  const vendor = vendors.find((v) => v.id === snack.vendorId);
+  const vendor = snack.vendor;
   const isFavorite = favorites.includes(snack.id);
 
   const handleAddToCart = () => {
@@ -42,7 +41,7 @@ export default function SnackCard({ snack }: SnackCardProps) {
     });
   }
   
-  const averageRating = snack.reviews.reduce((acc, review) => acc + review.rating, 0) / snack.reviews.length;
+  const averageRating = snack.reviews.length > 0 ? snack.reviews.reduce((acc, review) => acc + review.rating, 0) / snack.reviews.length : 0;
 
   return (
     <Card className="flex flex-col overflow-hidden transition-all hover:shadow-lg">

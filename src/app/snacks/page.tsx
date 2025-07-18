@@ -1,28 +1,49 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import SnackCard from "@/components/shared/SnackCard";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { allSnacks } from "@/lib/placeholder-data";
 import { Search } from 'lucide-react';
 import { PaginationComponent } from '@/components/shared/PaginationComponent';
+import type { Snack } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 8;
 
 export default function AllSnacksPage() {
+  const [allSnacks, setAllSnacks] = useState<Snack[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/snacks');
+        const data = await res.json();
+        setAllSnacks(data.snacks);
+        setCategories(['all', ...data.categories]);
+      } catch (error) {
+        console.error("Failed to fetch snacks", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-  const categories = useMemo(() => ['all', ...Array.from(new Set(allSnacks.map(s => s.category)))], []);
 
   const filteredSnacks = useMemo(() => allSnacks.filter(snack => {
     const matchesSearch = snack.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = category === 'all' || snack.category === category;
     return matchesSearch && matchesCategory;
-  }), [searchTerm, category]);
+  }), [allSnacks, searchTerm, category]);
 
   const totalPages = Math.ceil(filteredSnacks.length / ITEMS_PER_PAGE);
   const paginatedSnacks = filteredSnacks.slice(
@@ -64,7 +85,9 @@ export default function AllSnacksPage() {
             <Select value={category} onValueChange={(value) => {
                 setCategory(value);
                 setCurrentPage(1); // Reset to first page on filter change
-            }}>
+            }}
+            disabled={loading}
+            >
                 <SelectTrigger className="w-full md:w-[200px]">
                     <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -76,7 +99,19 @@ export default function AllSnacksPage() {
             </Select>
         </div>
 
-        {paginatedSnacks.length > 0 ? (
+        {loading ? (
+           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+             {[...Array(8)].map((_, i) => (
+                <div key={i} className="flex flex-col space-y-3">
+                  <Skeleton className="h-[200px] w-full rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+             ))}
+           </div>
+        ) : paginatedSnacks.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                 {paginatedSnacks.map((snack) => (
                     <SnackCard key={snack.id} snack={snack} />

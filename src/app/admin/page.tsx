@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Link from 'next/link';
@@ -34,7 +35,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { userOrders, vendors, allUsers } from "@/lib/placeholder-data";
+import { useEffect, useState } from 'react';
+import type { Order, User, Vendor } from '@/lib/types';
+import prisma from '@/lib/prisma';
 
 const salesData = [
   { name: "Mon", total: Math.floor(Math.random() * 5000) + 1000 },
@@ -48,13 +51,13 @@ const salesData = [
 
 const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'Preparing':
+      case 'PREPARING':
         return 'secondary';
-      case 'Ready for Pickup':
+      case 'READY_FOR_PICKUP':
         return 'default';
-      case 'Completed':
+      case 'COMPLETED':
         return 'outline';
-      case 'Cancelled':
+      case 'CANCELLED':
         return 'destructive';
       default:
         return 'outline';
@@ -62,8 +65,32 @@ const getStatusVariant = (status: string) => {
 };
 
 export default function AdminDashboardPage() {
-  const recentOrders = userOrders.slice(0, 5);
-  const totalRevenue = userOrders.reduce((sum, order) => sum + order.total, 0);
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    totalUsers: 0,
+    approvedVendors: 0,
+    totalOrders: 0
+  });
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+        setLoading(true);
+        try {
+            const response = await fetch('/api/admin/stats');
+            const data = await response.json();
+            setStats(data.stats);
+            setRecentOrders(data.recentOrders);
+        } catch (error) {
+            console.error("Failed to fetch admin stats:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+    fetchData();
+  }, []);
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -74,7 +101,7 @@ export default function AdminDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₦{totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">₦{stats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Across all vendors
             </p>
@@ -86,7 +113,7 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{allUsers.length}</div>
+            <div className="text-2xl font-bold">{stats.totalUsers}</div>
             <p className="text-xs text-muted-foreground">
               Customers and Vendors
             </p>
@@ -98,7 +125,7 @@ export default function AdminDashboardPage() {
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{vendors.filter(v => v.isApproved).length}</div>
+            <div className="text-2xl font-bold">{stats.approvedVendors}</div>
             <p className="text-xs text-muted-foreground">
               Total approved vendors
             </p>
@@ -110,7 +137,7 @@ export default function AdminDashboardPage() {
             <Utensils className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userOrders.length}</div>
+            <div className="text-2xl font-bold">{stats.totalOrders}</div>
             <p className="text-xs text-muted-foreground">
               In platform history
             </p>
@@ -171,17 +198,24 @@ export default function AdminDashboardPage() {
                     {recentOrders.map((order) => (
                         <TableRow key={order.id}>
                             <TableCell>
-                                <div className="font-medium">{order.id}</div>
+                                <div className="font-medium">{order.id.substring(0,8)}...</div>
                                 <div className="hidden text-sm text-muted-foreground md:inline">
-                                    {order.userId}
+                                    {order.user?.email}
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <Badge variant={getStatusVariant(order.status) as any}>{order.status}</Badge>
+                                <Badge variant={getStatusVariant(order.status) as any}>{order.status.replace('_', ' ')}</Badge>
                             </TableCell>
                             <TableCell className="text-right">₦{order.total.toLocaleString()}</TableCell>
                         </TableRow>
                     ))}
+                     {recentOrders.length === 0 && !loading && (
+                        <TableRow>
+                            <TableCell colSpan={3} className="h-24 text-center">
+                                No recent orders.
+                            </TableCell>
+                        </TableRow>
+                    )}
                 </TableBody>
             </Table>
           </CardContent>
