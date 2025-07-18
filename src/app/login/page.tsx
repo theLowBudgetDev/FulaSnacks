@@ -14,11 +14,11 @@ export default function LoginPage() {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // This is where you would add your authentication logic.
-    // For this demo, we'll just show a toast and redirect.
+    // In a real app, you would add authentication logic here.
+    // For this demo, we assume a successful vendor login.
     toast({
       title: "Login Successful",
-      description: "Redirecting to the dashboard...",
+      description: "Redirecting to the vendor dashboard...",
     });
     router.push('/dashboard');
   };
@@ -27,8 +27,8 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-2xl">Welcome Back!</CardTitle>
-          <CardDescription>Log in to continue to FulaSnacks</CardDescription>
+          <CardTitle className="font-headline text-2xl">Vendor Login</CardTitle>
+          <CardDescription>Log in to manage your store and orders.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -41,15 +41,15 @@ export default function LoginPage() {
               <Input id="password" type="password" required />
             </div>
             <Button type="submit" className="w-full">
-              Login
+              Login to Dashboard
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <div className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{' '}
+            Want to sell on FulaSnacks?{' '}
             <Link href="/signup" className="font-semibold text-primary hover:underline">
-              Sign up
+              Become a vendor
             </Link>
           </div>
         </CardFooter>
