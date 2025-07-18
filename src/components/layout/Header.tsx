@@ -104,15 +104,13 @@ export default function Header() {
         </div>
         
         <div className="flex items-center justify-end gap-2">
-          <Button asChild variant="ghost" size="icon" className="relative hover:bg-transparent">
-            <Link href="/cart">
-              <ShoppingCart className="h-5 w-5" />
+          <Link href="/cart" className="relative p-2">
+              <ShoppingCart className="h-5 w-5 text-foreground" />
               {cartItemCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">{cartItemCount}</Badge>
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{cartItemCount}</Badge>
               )}
               <span className="sr-only">Cart</span>
-            </Link>
-          </Button>
+          </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="hover:bg-transparent">
