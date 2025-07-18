@@ -54,7 +54,7 @@ export default function SnackCard({ snack }: SnackCardProps) {
         <p className="text-xl font-bold text-foreground">
           ₦{snack.price.toLocaleString()}
         </p>
-        <Button size="sm" onClick={handleAddToCart} className="bg-accent text-accent-foreground hover:bg-accent/90">
+        <Button size="sm" onClick={handleAddToCart}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add to Cart
         </Button>

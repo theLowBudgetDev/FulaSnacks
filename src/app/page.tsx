@@ -41,6 +41,13 @@ export default function Home() {
               <SnackCard key={snack.id} snack={snack} />
             ))}
           </div>
+           <div className="text-center mt-12">
+             <Button asChild variant="link" className="text-accent text-lg">
+                <Link href="/snacks">
+                  View all snacks <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+             </Button>
+          </div>
         </div>
       </section>
       

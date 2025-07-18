@@ -113,7 +113,7 @@ export default function CartPage() {
                        <p className="text-sm text-muted-foreground">
                            You will be redirected to our secure payment gateway to complete your purchase.
                        </p>
-                       <Button onClick={handleCheckout} className="w-full bg-accent text-accent-foreground hover:bg-accent/90" size="lg">
+                       <Button onClick={handleCheckout} className="w-full bg-primary text-primary-foreground hover:bg-primary/90" size="lg">
                            <CreditCard className="mr-2 h-5 w-5" />
                            Proceed to Payment
                        </Button>
