@@ -42,8 +42,8 @@ export default function AdminLayout({
     <SidebarProvider>
       <Sidebar collapsible="icon">
         <SidebarHeader className="p-4">
-            <div className="flex items-center gap-3">
-                 <Avatar>
+            <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
+                 <Avatar className="group-data-[collapsible=icon]:size-8 transition-all duration-300">
                     <AvatarImage src="https://placehold.co/100x100.png" alt="Admin" data-ai-hint="logo shield"/>
                     <AvatarFallback>A</AvatarFallback>
                 </Avatar>
