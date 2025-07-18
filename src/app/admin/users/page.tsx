@@ -1,11 +1,7 @@
 
 "use client";
 
-<<<<<<< HEAD
-import { useState, useMemo, useEffect } from 'react';
-=======
 import { useState, useEffect } from 'react';
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import type { User } from '@/lib/types';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,20 +15,12 @@ import { useToast } from '@/hooks/use-toast';
 import { UserProfileDialog } from '@/components/admin/UserProfileDialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-<<<<<<< HEAD
-=======
 import { useRouter, useSearchParams } from 'next/navigation';
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminUsersPage() {
-<<<<<<< HEAD
-    const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-=======
     const router = useRouter();
     const searchParams = useSearchParams();
     const { toast } = useToast();
@@ -41,34 +29,12 @@ export default function AdminUsersPage() {
     const [totalUsers, setTotalUsers] = useState(0);
     const [loading, setLoading] = useState(true);
     
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
 
-<<<<<<< HEAD
-    useEffect(() => {
-        async function fetchUsers() {
-            setLoading(true);
-            // const response = await fetch('/api/admin/users');
-            // const data = await response.json();
-            // setUsers(data);
-            setLoading(false);
-        }
-        fetchUsers();
-    }, []);
-
-    const filteredUsers = useMemo(() => {
-        return users.filter(user => {
-            const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesRole = roleFilter === 'all' || user.role.toLowerCase() === roleFilter;
-            return matchesSearch && matchesRole;
-        });
-    }, [users, searchTerm, roleFilter]);
-=======
     const searchTerm = searchParams.get('search') || '';
     const roleFilter = searchParams.get('role') || 'all';
     const currentPage = Number(searchParams.get('page') || '1');
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -105,17 +71,10 @@ export default function AdminUsersPage() {
     }
     
     const getRoleVariant = (role: string) => {
-<<<<<<< HEAD
-        switch (role) {
-            case 'ADMIN': return 'destructive';
-            case 'VENDOR': return 'default';
-            case 'CUSTOMER': return 'secondary';
-=======
         switch (role.toLowerCase()) {
             case 'admin': return 'destructive';
             case 'vendor': return 'default';
             case 'customer': return 'secondary';
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             default: return 'outline';
         }
     };
@@ -185,26 +144,12 @@ export default function AdminUsersPage() {
           </TableHeader>
           <TableBody>
             {loading ? (
-<<<<<<< HEAD
-                [...Array(ITEMS_PER_PAGE)].map((_, i) => (
-                    <TableRow key={i}>
-                        <TableCell><Skeleton className="h-10 w-40" /></TableCell>
-                        <TableCell><Skeleton className="h-6 w-32" /></TableCell>
-                        <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
-                        <TableCell><Skeleton className="h-8 w-8" /></TableCell>
-                    </TableRow>
-                ))
-            ) : paginatedUsers.length > 0 ? (
-                paginatedUsers.map(user => (
-=======
                 Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                     <TableRow key={i}>
                         <TableCell colSpan={5}><Skeleton className="h-10 w-full" /></TableCell>
                     </TableRow>
                 ))
             ) : users.map(user => (
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                 <TableRow key={user.id}>
                     <TableCell className="font-medium flex items-center gap-3">
                         <Avatar>
@@ -238,13 +183,8 @@ export default function AdminUsersPage() {
                         </DropdownMenu>
                     </TableCell>
                 </TableRow>
-<<<<<<< HEAD
-            ))
-            ) : (
-=======
             ))}
              {users.length === 0 && !loading && (
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                 <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                         No users found.

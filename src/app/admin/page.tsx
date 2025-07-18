@@ -1,10 +1,4 @@
 
-<<<<<<< HEAD
-
-"use client";
-
-=======
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import Link from 'next/link';
 import {
   Card,
@@ -38,69 +32,24 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-<<<<<<< HEAD
-import { useEffect, useState } from 'react';
-import type { Order, User, Vendor } from '@/lib/types';
-import prisma from '@/lib/prisma';
-
-const salesData = [
-  { name: "Mon", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Tue", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Wed", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Thu", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Fri", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Sat", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Sun", total: Math.floor(Math.random() * 5000) + 1000 },
-];
-=======
 import { prisma } from '@/lib/prisma';
 import { format, subDays } from 'date-fns';
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
 const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'PREPARING':
+      case 'Preparing':
         return 'secondary';
-      case 'READY_FOR_PICKUP':
+      case 'Ready for Pickup':
         return 'default';
-      case 'COMPLETED':
+      case 'Completed':
         return 'outline';
-      case 'CANCELLED':
+      case 'Cancelled':
         return 'destructive';
       default:
         return 'outline';
     }
 };
 
-<<<<<<< HEAD
-export default function AdminDashboardPage() {
-  const [stats, setStats] = useState({
-    totalRevenue: 0,
-    totalUsers: 0,
-    approvedVendors: 0,
-    totalOrders: 0
-  });
-  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-        setLoading(true);
-        try {
-            const response = await fetch('/api/admin/stats');
-            const data = await response.json();
-            setStats(data.stats);
-            setRecentOrders(data.recentOrders);
-        } catch (error) {
-            console.error("Failed to fetch admin stats:", error);
-        } finally {
-            setLoading(false);
-        }
-    }
-    fetchData();
-  }, []);
-
-=======
 export default async function AdminDashboardPage() {
   const sevenDaysAgo = subDays(new Date(), 7);
 
@@ -145,7 +94,6 @@ export default async function AdminDashboardPage() {
       day.total += sale.total;
     }
   });
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   return (
     <div className="flex flex-col gap-6">
@@ -156,11 +104,7 @@ export default async function AdminDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-<<<<<<< HEAD
-            <div className="text-2xl font-bold">₦{stats.totalRevenue.toLocaleString()}</div>
-=======
             <div className="text-2xl font-bold">₦{(totalRevenue._sum.total || 0).toLocaleString()}</div>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               Across all vendors
             </p>
@@ -172,11 +116,7 @@ export default async function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-<<<<<<< HEAD
-            <div className="text-2xl font-bold">{stats.totalUsers}</div>
-=======
             <div className="text-2xl font-bold">{totalUsers}</div>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               Customers and Vendors
             </p>
@@ -188,11 +128,7 @@ export default async function AdminDashboardPage() {
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-<<<<<<< HEAD
-            <div className="text-2xl font-bold">{stats.approvedVendors}</div>
-=======
             <div className="text-2xl font-bold">{activeVendors}</div>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               Total approved vendors
             </p>
@@ -204,11 +140,7 @@ export default async function AdminDashboardPage() {
             <Utensils className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-<<<<<<< HEAD
-            <div className="text-2xl font-bold">{stats.totalOrders}</div>
-=======
             <div className="text-2xl font-bold">{totalOrdersCount}</div>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <p className="text-xs text-muted-foreground">
               In platform history
             </p>
@@ -271,11 +203,7 @@ export default async function AdminDashboardPage() {
                             <TableCell>
                                 <div className="font-medium">{order.id.substring(0,8)}...</div>
                                 <div className="hidden text-sm text-muted-foreground md:inline">
-<<<<<<< HEAD
-                                    {order.user?.email}
-=======
                                     {order.user.email}
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                                 </div>
                             </TableCell>
                             <TableCell>
@@ -284,7 +212,7 @@ export default async function AdminDashboardPage() {
                             <TableCell className="text-right">₦{order.total.toLocaleString()}</TableCell>
                         </TableRow>
                     ))}
-                     {recentOrders.length === 0 && !loading && (
+                     {recentOrders.length === 0 && (
                         <TableRow>
                             <TableCell colSpan={3} className="h-24 text-center">
                                 No recent orders.

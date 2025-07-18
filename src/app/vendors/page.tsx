@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-import VendorCard from "@/components/shared/VendorCard";
-import prisma from "@/lib/prisma";
-
-export default async function VendorsPage() {
-  const vendors = await prisma.vendor.findMany({
-    where: { isApproved: true },
-     include: {
-        reviews: {
-            include: {
-                user: true,
-            }
-        },
-        owner: true,
-    }
-  });
-=======
 
 import VendorCard from "@/components/shared/VendorCard";
 import { PaginationComponent } from '@/components/shared/PaginationComponent';
@@ -41,7 +24,6 @@ export default async function VendorsPage({ searchParams }: { searchParams: { pa
   });
 
   const totalPages = Math.ceil(vendorsCount / ITEMS_PER_PAGE);
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   return (
     <div className="bg-card">
@@ -59,15 +41,12 @@ export default async function VendorsPage({ searchParams }: { searchParams: { pa
                 <VendorCard key={vendor.id} vendor={vendor} />
             ))}
         </div>
-<<<<<<< HEAD
-=======
         <div className="mt-12 flex justify-center">
              <PaginationComponent 
                 totalPages={totalPages}
                 currentPage={currentPage}
             />
         </div>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
       </div>
     </div>
   );

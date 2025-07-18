@@ -7,51 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { PaginationComponent } from '@/components/shared/PaginationComponent';
-<<<<<<< HEAD
-import type { Snack } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
-=======
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Snack } from '@/lib/types';
 import { useSearchParams, useRouter } from 'next/navigation';
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
 const ITEMS_PER_PAGE = 8;
 
 export default function AllSnacksPage() {
-<<<<<<< HEAD
-  const [allSnacks, setAllSnacks] = useState<Snack[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch('/api/snacks');
-        const data = await res.json();
-        setAllSnacks(data.snacks);
-        setCategories(['all', ...data.categories]);
-      } catch (error) {
-        console.error("Failed to fetch snacks", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-
-  const filteredSnacks = useMemo(() => allSnacks.filter(snack => {
-    const matchesSearch = snack.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = category === 'all' || snack.category === category;
-    return matchesSearch && matchesCategory;
-  }), [allSnacks, searchTerm, category]);
-=======
   const router = useRouter();
   const searchParams = useSearchParams();
   const [snacks, setSnacks] = useState<Snack[]>([]);
@@ -95,7 +57,6 @@ export default function AllSnacksPage() {
   }, [searchTerm, category, currentPage]);
   
   const totalPages = Math.ceil(totalSnacks / ITEMS_PER_PAGE);
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const params = new URLSearchParams(searchParams);
@@ -141,16 +102,7 @@ export default function AllSnacksPage() {
                     onChange={handleSearchChange}
                 />
             </div>
-<<<<<<< HEAD
-            <Select value={category} onValueChange={(value) => {
-                setCategory(value);
-                setCurrentPage(1); // Reset to first page on filter change
-            }}
-            disabled={loading}
-            >
-=======
             <Select value={category} onValueChange={handleCategoryChange}>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                 <SelectTrigger className="w-full md:w-[200px]">
                     <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -163,21 +115,6 @@ export default function AllSnacksPage() {
         </div>
 
         {loading ? (
-<<<<<<< HEAD
-           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-             {[...Array(8)].map((_, i) => (
-                <div key={i} className="flex flex-col space-y-3">
-                  <Skeleton className="h-[200px] w-full rounded-xl" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                  </div>
-                </div>
-             ))}
-           </div>
-        ) : paginatedSnacks.length > 0 ? (
-=======
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                     <div key={i} className="space-y-3">

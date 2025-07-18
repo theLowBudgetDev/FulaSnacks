@@ -22,10 +22,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminVendorsPage() {
-<<<<<<< HEAD
-    const [vendors, setVendors] = useState<Vendor[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
-=======
     const router = useRouter();
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [totalVendors, setTotalVendors] = useState(0);
@@ -34,7 +30,6 @@ export default function AdminVendorsPage() {
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get('page')) || 1;
 
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const { toast } = useToast();
@@ -125,13 +120,8 @@ export default function AdminVendorsPage() {
                             </AvatarFallback>
                         </Avatar>
                        <div>
-<<<<<<< HEAD
-                         {vendor.name}
-                         <div className="text-sm text-muted-foreground">{vendor.owner.email}</div>
-=======
                          {vendor.user.name}
                          <div className="text-sm text-muted-foreground">{vendor.user.email}</div>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                        </div>
                     </TableCell>
                     <TableCell>{vendor.campusLocation}</TableCell>
@@ -157,11 +147,7 @@ export default function AdminVendorsPage() {
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                     <DropdownMenuItem asChild>
-<<<<<<< HEAD
-                                        <Link href={`/vendors/${vendor.id}`} target="_blank">View Storefront</Link>
-=======
                                         <Link href={`/vendors/${vendor.id}`}>View Storefront</Link>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteVendor(vendor)}>Delete Vendor</DropdownMenuItem>
@@ -171,7 +157,7 @@ export default function AdminVendorsPage() {
                     </TableCell>
                 </TableRow>
             ))}
-             {paginatedVendors.length === 0 && (
+             {vendors.length === 0 && !loading && (
                 <TableRow>
                     <TableCell colSpan={4} className="h-24 text-center">
                         No vendors found.

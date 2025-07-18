@@ -10,10 +10,6 @@ interface VendorCardProps {
   vendor: Vendor;
 }
 
-<<<<<<< HEAD
-export default function VendorCard({ vendor }: VendorCardProps) {
-  const averageRating = vendor.reviews.length > 0 ? vendor.reviews.reduce((acc, review) => acc + review.rating, 0) / vendor.reviews.length : 0;
-=======
 export default async function VendorCard({ vendor }: VendorCardProps) {
   // Since reviews are on snacks, we need to aggregate them.
   const reviews = await prisma.review.findMany({
@@ -25,7 +21,6 @@ export default async function VendorCard({ vendor }: VendorCardProps) {
   });
 
   const averageRating = reviews.length > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length : 0;
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
   
   return (
     <Link href={`/vendors/${vendor.id}`}>

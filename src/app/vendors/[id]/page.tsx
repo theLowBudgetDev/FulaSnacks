@@ -1,10 +1,6 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-<<<<<<< HEAD
-import prisma from '@/lib/prisma';
-=======
 import { prisma } from '@/lib/prisma';
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 import SnackCard from '@/components/shared/SnackCard';
 import { MapPin, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,33 +11,6 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
   const vendor = await prisma.vendor.findUnique({
     where: { id: params.id, isApproved: true },
     include: {
-<<<<<<< HEAD
-      products: {
-        include: {
-          reviews: {
-            include: {
-              user: true,
-            },
-          },
-          vendor: {
-            include: {
-              reviews: {
-                include: {
-                  user: true,
-                },
-              },
-              owner: true,
-            },
-          },
-        },
-      },
-      reviews: {
-        include: {
-          user: true,
-        },
-      },
-      owner: true,
-=======
       user: true,
       products: {
         include: {
@@ -49,36 +18,12 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
           reviews: { include: { user: true } },
         }
       },
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
     },
   });
 
   if (!vendor) {
     notFound();
   }
-<<<<<<< HEAD
-  
-  const snacks = vendor.products;
-
-  const allReviews = await prisma.review.findMany({
-    where: {
-      snack: {
-        vendorId: vendor.id,
-      },
-    },
-    include: {
-        user: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    }
-  });
-  
-  const averageRating = allReviews.length > 0
-    ? allReviews.reduce((acc, review) => acc + review.rating, 0) / allReviews.length
-    : 0;
-=======
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
 
   const reviews = await prisma.review.findMany({
     where: { snack: { vendorId: vendor.id } },
@@ -112,20 +57,12 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
                     <MapPin className="h-5 w-5" />
                     <span>{vendor.campusLocation}</span>
                 </div>
-<<<<<<< HEAD
-                {allReviews.length > 0 && (
-=======
                 {reviews.length > 0 && (
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                  <>
                     <Separator orientation="vertical" className="h-5"/>
                     <div className="flex items-center gap-1.5 text-amber-500 font-medium">
                         <Star className="h-5 w-5 fill-current" />
-<<<<<<< HEAD
-                        <span>{averageRating.toFixed(1)} ({allReviews.length} reviews)</span>
-=======
                         <span>{averageRating.toFixed(1)} ({reviews.length} reviews)</span>
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                     </div>
                  </>
                 )}
@@ -156,17 +93,10 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
                  <h2 className="font-headline text-3xl font-bold mb-8">
                     Reviews
                 </h2>
-<<<<<<< HEAD
-                {allReviews.length > 0 ? (
-                    <Card>
-                        <CardContent className="p-6 space-y-6">
-                            {allReviews.slice(0, 5).map(review => (
-=======
                 {reviews.length > 0 ? (
                     <Card>
                         <CardContent className="p-6 space-y-6">
                             {reviews.map(review => (
->>>>>>> e541f2755643cbd1fd5931961682235fd67a180c
                                 <div key={review.id}>
                                     <div className="flex items-center justify-between">
                                         <p className="font-semibold">{review.user.name}</p>
