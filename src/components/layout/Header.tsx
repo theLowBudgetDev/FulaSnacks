@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -36,17 +37,20 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-6 flex items-center gap-2">
-          <UtensilsCrossed className="h-6 w-6 text-primary" />
-          <span className="font-headline text-lg font-bold">FulaSnacks</span>
-        </Link>
-        <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
-          ))}
-        </nav>
-        <div className="flex flex-1 items-center justify-end gap-2">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2">
+              <UtensilsCrossed className="h-6 w-6 text-primary" />
+              <span className="hidden font-headline text-lg font-bold sm:inline-block">FulaSnacks</span>
+            </Link>
+            <nav className="hidden items-center gap-6 md:flex">
+              {navLinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+              ))}
+            </nav>
+        </div>
+        
+        <div className="flex items-center justify-end gap-2">
           <Button asChild variant="ghost" size="icon">
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
