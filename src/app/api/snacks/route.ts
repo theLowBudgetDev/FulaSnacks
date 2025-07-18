@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
@@ -12,12 +12,7 @@ export async function GET() {
         },
         vendor: {
             include: {
-                reviews: {
-                    include: {
-                        user: true
-                    }
-                },
-                owner: true
+                user: true
             }
         }
       },
