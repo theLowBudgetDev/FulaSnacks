@@ -1,13 +1,19 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import type { Order } from "@/lib/types";
 import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText } from "lucide-react";
+import { OrderDetailDialog } from "@/components/shared/OrderDetailDialog";
 
 export default function OrdersPage() {
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
   const activeOrders = userOrders.filter(
     (order) => order.status === "Preparing" || order.status === "Ready for Pickup"
   );
@@ -54,11 +60,9 @@ export default function OrdersPage() {
                   </TableCell>
                   <TableCell className="text-right">₦{order.total.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
-                    <Button asChild variant="ghost" size="sm">
-                      <Link href={`/orders/${order.id}`}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        View Details
-                      </Link>
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(order)}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Details
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -77,28 +81,41 @@ export default function OrdersPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="mb-12">
-        <h1 className="font-headline text-4xl font-bold tracking-tight md:text-5xl">
-          My Orders
-        </h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Track your current orders and review your order history.
-        </p>
-      </div>
+    <>
+      <div className="container mx-auto px-4 py-16">
+        <div className="mb-12">
+          <h1 className="font-headline text-4xl font-bold tracking-tight md:text-5xl">
+            My Orders
+          </h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            Track your current orders and review your order history.
+          </p>
+        </div>
 
-      <Tabs defaultValue="active" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
-          <TabsTrigger value="active">Active Orders</TabsTrigger>
-          <TabsTrigger value="past">Past Orders</TabsTrigger>
-        </TabsList>
-        <TabsContent value="active" className="mt-6">
-          <OrderTable orders={activeOrders} />
-        </TabsContent>
-        <TabsContent value="past" className="mt-6">
-          <OrderTable orders={pastOrders} />
-        </TabsContent>
-      </Tabs>
-    </div>
+        <Tabs defaultValue="active" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
+            <TabsTrigger value="active">Active Orders</TabsTrigger>
+            <TabsTrigger value="past">Past Orders</TabsTrigger>
+          </TabsList>
+          <TabsContent value="active" className="mt-6">
+            <OrderTable orders={activeOrders} />
+          </TabsContent>
+          <TabsContent value="past" className="mt-6">
+            <OrderTable orders={pastOrders} />
+          </TabsContent>
+        </Tabs>
+      </div>
+      {selectedOrder && (
+        <OrderDetailDialog 
+          order={selectedOrder}
+          open={!!selectedOrder}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setSelectedOrder(null);
+            }
+          }}
+        />
+      )}
+    </>
   );
 }
