@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { vendors as initialVendors } from "@/lib/placeholder-data";
 import type { Vendor } from '@/lib/types';
@@ -27,11 +27,14 @@ export default function AdminVendorsPage() {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const { toast } = useToast();
 
+    const paginatedVendors = useMemo(() => {
+        return vendors.slice(
+            (currentPage - 1) * ITEMS_PER_PAGE,
+            currentPage * ITEMS_PER_PAGE
+        );
+    }, [vendors, currentPage]);
+    
     const totalPages = Math.ceil(vendors.length / ITEMS_PER_PAGE);
-    const paginatedVendors = vendors.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
 
     const handleApprovalChange = (vendorId: string, isApproved: boolean) => {
         setVendors(vendors.map(v => v.id === vendorId ? {...v, isApproved } : v));

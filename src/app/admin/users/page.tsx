@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { allUsers } from "@/lib/placeholder-data";
 import type { User } from '@/lib/types';
 import { Badge } from "@/components/ui/badge";
@@ -24,12 +24,15 @@ export default function AdminUsersPage() {
     const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
     const { toast } = useToast();
 
+    const paginatedUsers = useMemo(() => {
+        return users.slice(
+            (currentPage - 1) * ITEMS_PER_PAGE,
+            currentPage * ITEMS_PER_PAGE
+        );
+    }, [users, currentPage]);
+    
     const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
-    const paginatedUsers = users.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
-
+    
     const getRoleVariant = (role: string) => {
         switch (role) {
             case 'admin': return 'destructive';

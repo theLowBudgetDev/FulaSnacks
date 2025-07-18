@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import SnackCard from "@/components/shared/SnackCard";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,13 +16,13 @@ export default function AllSnacksPage() {
   const [category, setCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const categories = ['all', ...Array.from(new Set(allSnacks.map(s => s.category)))];
+  const categories = useMemo(() => ['all', ...Array.from(new Set(allSnacks.map(s => s.category)))], []);
 
-  const filteredSnacks = allSnacks.filter(snack => {
+  const filteredSnacks = useMemo(() => allSnacks.filter(snack => {
     const matchesSearch = snack.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = category === 'all' || snack.category === category;
     return matchesSearch && matchesCategory;
-  });
+  }), [searchTerm, category]);
 
   const totalPages = Math.ceil(filteredSnacks.length / ITEMS_PER_PAGE);
   const paginatedSnacks = filteredSnacks.slice(
