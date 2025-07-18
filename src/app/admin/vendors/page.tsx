@@ -45,10 +45,10 @@ export default function AdminVendorsPage() {
                 page: String(currentPage),
                 limit: String(ITEMS_PER_PAGE),
             });
-            // const res = await fetch(`/api/admin/vendors?${params.toString()}`);
-            // const data = await res.json();
-            // setVendors(data.vendors);
-            // setTotalVendors(data.total);
+            const res = await fetch(`/api/admin/vendors?${params.toString()}`);
+            const data = await res.json();
+            setVendors(data.vendors);
+            setTotalVendors(data.total);
             setLoading(false);
         };
         fetchVendors();

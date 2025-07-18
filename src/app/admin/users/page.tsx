@@ -45,10 +45,10 @@ export default function AdminUsersPage() {
                 page: String(currentPage),
                 limit: String(ITEMS_PER_PAGE),
             });
-            // const res = await fetch(`/api/admin/users?${params.toString()}`);
-            // const data = await res.json();
-            // setUsers(data.users);
-            // setTotalUsers(data.total);
+            const res = await fetch(`/api/admin/users?${params.toString()}`);
+            const data = await res.json();
+            setUsers(data.users);
+            setTotalUsers(data.total);
             setLoading(false);
         };
         fetchUsers();

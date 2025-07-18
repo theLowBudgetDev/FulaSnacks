@@ -39,10 +39,10 @@ export default function AdminOrdersPage() {
                 page: String(currentPage),
                 limit: String(ITEMS_PER_PAGE),
             });
-            // const res = await fetch(`/api/admin/orders?${params.toString()}`);
-            // const data = await res.json();
-            // setOrders(data.orders);
-            // setTotalOrders(data.total);
+            const res = await fetch(`/api/admin/orders?${params.toString()}`);
+            const data = await res.json();
+            setOrders(data.orders);
+            setTotalOrders(data.total);
             setLoading(false);
         };
         fetchOrders();
