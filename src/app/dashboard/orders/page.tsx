@@ -1,13 +1,21 @@
+"use client";
+
+import { useState } from 'react';
 import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import type { Order } from '@/lib/types';
 
 export default function VendorOrdersPage() {
-    const vendorOrders = userOrders.filter(order => order.items.some(item => item.snack.vendorId === 'vendor-1'));
+    const [orders, setOrders] = useState<Order[]>(userOrders.filter(order => order.items.some(item => item.snack.vendorId === 'vendor-1')));
+
+    const handleStatusChange = (orderId: string, newStatus: Order['status']) => {
+        setOrders(currentOrders => currentOrders.map(order => order.id === orderId ? {...order, status: newStatus} : order));
+    }
 
     const getStatusVariant = (status: string) => {
         switch (status) {
@@ -46,7 +54,7 @@ export default function VendorOrdersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vendorOrders.map(order => (
+            {orders.map(order => (
                 <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.id}</TableCell>
                     <TableCell>Customer Name</TableCell>
@@ -67,9 +75,9 @@ export default function VendorOrdersPage() {
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Update Status</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuCheckboxItem checked={order.status === 'Preparing'}>Preparing</DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={order.status === 'Ready for Pickup'}>Ready for Pickup</DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem checked={order.status === 'Completed'}>Completed</DropdownMenuCheckboxItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'Preparing')}>Preparing</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'Ready for Pickup')}>Ready for Pickup</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'Completed')}>Completed</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </TableCell>

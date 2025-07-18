@@ -15,7 +15,6 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Home, ShoppingBag, Utensils, LogOut, Settings } from "lucide-react";
 
 const navItems = [
@@ -37,7 +36,7 @@ export default function DashboardLayout({
         <SidebarHeader className="p-4">
             <div className="flex items-center gap-3">
                  <Avatar>
-                    <AvatarImage src="https://placehold.co/100x100" alt="Vendor" data-ai-hint="logo cooking"/>
+                    <AvatarImage src="https://placehold.co/100x100.png" alt="Vendor" data-ai-hint="logo cooking"/>
                     <AvatarFallback>V</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col group-data-[collapsible=icon]:hidden">
@@ -78,7 +77,7 @@ export default function DashboardLayout({
             <div className="flex items-center gap-4">
                 <SidebarTrigger className="md:hidden"/>
                 <h1 className="text-xl font-semibold font-headline">
-                    {navItems.find(item => pathname.startsWith(item.href))?.label || 'Dashboard'}
+                    {navItems.find(item => item.href === pathname)?.label || 'Dashboard'}
                 </h1>
             </div>
         </header>

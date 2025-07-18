@@ -9,14 +9,14 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <section className="bg-card py-20 md:py-32">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4 text-left">
           <h1 className="font-headline text-4xl font-bold tracking-tight text-primary md:text-6xl">
             FulaSnacks
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground md:text-xl">
+          <p className="mt-4 max-w-2xl text-lg text-muted-foreground md:text-xl">
             Your one-stop shop for the best snacks at Federal University Lafia. Quick, easy, and delicious.
           </p>
-          <div className="mt-8 flex justify-center gap-4">
+          <div className="mt-8 flex justify-start gap-4">
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Link href="#featured-snacks">
                 Order Now <ArrowRight className="ml-2 h-5 w-5" />

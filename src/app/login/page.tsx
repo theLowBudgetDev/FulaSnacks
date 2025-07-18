@@ -1,10 +1,28 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    // This is where you would add your authentication logic.
+    // For this demo, we'll just show a toast and redirect.
+    toast({
+      title: "Login Successful",
+      description: "Redirecting to the dashboard...",
+    });
+    router.push('/dashboard');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="w-full max-w-sm">
@@ -13,10 +31,10 @@ export default function LoginPage() {
           <CardDescription>Log in to continue to FulaSnacks</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="student@fulafia.edu.ng" required />
+              <Input id="email" type="email" placeholder="vendor@fulafia.edu.ng" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
