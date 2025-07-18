@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link";
@@ -62,7 +63,7 @@ export default function DashboardLayout({
         <SidebarFooter>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild tooltip="Logout">
                         <Link href="/">
                             <LogOut />
                             <span>Logout</span>
@@ -75,7 +76,7 @@ export default function DashboardLayout({
       <SidebarInset>
         <header className="flex h-16 items-center justify-between border-b bg-background px-6">
             <div className="flex items-center gap-4">
-                <SidebarTrigger className="md:hidden"/>
+                <SidebarTrigger />
                 <h1 className="text-xl font-semibold font-headline">
                     {navItems.find(item => item.href === pathname)?.label || 'Dashboard'}
                 </h1>
