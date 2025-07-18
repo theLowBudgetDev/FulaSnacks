@@ -1,5 +1,5 @@
 
-import type { Snack, Vendor, Order, Review } from './types';
+import type { Snack, Vendor, Order, Review, User } from './types';
 
 const reviews: Review[] = [
     { id: 'rev-1', userId: 'user-123', userName: 'Jane Doe', rating: 5, comment: 'Absolutely delicious! Best meat pie on campus.', date: '2023-10-20' },
@@ -16,6 +16,7 @@ export const vendors: Vendor[] = [
     logoUrl: 'https://placehold.co/400x400.png',
     campusLocation: 'Faculty of Arts Complex',
     reviews: reviews.slice(0,2),
+    isApproved: true,
   },
   {
     id: 'vendor-2',
@@ -24,6 +25,7 @@ export const vendors: Vendor[] = [
     logoUrl: 'https://placehold.co/400x400.png',
     campusLocation: 'University Library Entrance',
     reviews: [reviews[2]],
+    isApproved: true,
   },
   {
     id: 'vendor-3',
@@ -32,6 +34,7 @@ export const vendors: Vendor[] = [
     logoUrl: 'https://placehold.co/400x400.png',
     campusLocation: 'Student Union Building (SUB)',
     reviews: [],
+    isApproved: false,
   },
 ];
 
@@ -242,4 +245,12 @@ export const userOrders: Order[] = [
     status: 'Cancelled',
     orderDate: new Date(Date.now() - 86400000 * 3).toISOString(), // 3 days ago
   }
+];
+
+export const allUsers: User[] = [
+    { id: 'user-1', name: 'Admin User', email: 'admin@fulafia.edu.ng', avatarUrl: 'https://placehold.co/100x100.png', role: 'admin', createdAt: new Date(Date.now() - 86400000 * 30).toISOString() },
+    { id: 'user-2', name: 'Alex Doe', email: 'alex.doe@fulafia.edu.ng', avatarUrl: 'https://placehold.co/100x100.png', role: 'customer', createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
+    { id: 'vendor-1', name: 'Mama Put Delights', email: 'vendor@fulafia.edu.ng', avatarUrl: 'https://placehold.co/100x100.png', role: 'vendor', createdAt: new Date(Date.now() - 86400000 * 10).toISOString() },
+    { id: 'vendor-2', name: 'Juice & Smoothie Bar', email: 'juicebar@fulafia.edu.ng', avatarUrl: 'https://placehold.co/100x100.png', role: 'vendor', createdAt: new Date(Date.now() - 86400000 * 15).toISOString() },
+     { id: 'vendor-3', name: 'Campus Grills', email: 'grills@fulafia.edu.ng', avatarUrl: 'https://placehold.co/100x100.png', role: 'vendor', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
 ];

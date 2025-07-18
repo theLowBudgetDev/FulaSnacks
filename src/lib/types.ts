@@ -26,6 +26,7 @@ export interface Vendor {
   logoUrl: string;
   campusLocation: string;
   reviews: Review[];
+  isApproved: boolean;
 }
 
 export interface CartItem {
@@ -47,4 +48,6 @@ export interface User {
   name: string;
   email: string;
   avatarUrl: string;
+  role: 'customer' | 'vendor' | 'admin';
+  createdAt: string;
 }

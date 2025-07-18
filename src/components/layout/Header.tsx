@@ -11,6 +11,7 @@ import {
   LogOut,
   ShoppingBag as ShoppingBagIcon,
   Heart,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -105,7 +106,7 @@ export default function Header() {
         </div>
         
         <div className="flex items-center justify-end gap-2">
-          <Button asChild variant="ghost" size="icon" className="relative hover:bg-transparent">
+          <Button asChild variant="ghost" size="icon" className="relative">
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               {cartItemCount > 0 && (
@@ -116,7 +117,7 @@ export default function Header() {
           </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="hover:bg-transparent">
+                <Button variant="ghost" size="icon">
                     <Avatar className="h-8 w-8">
                         <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar"/>
                         <AvatarFallback>U</AvatarFallback>
@@ -135,8 +136,13 @@ export default function Header() {
                         <DropdownMenuItem asChild>
                             <Link href="/orders"><ShoppingBagIcon className="mr-2 h-4 w-4" />My Orders</Link>
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>For Staff</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
                             <Link href="/dashboard"><LayoutGrid className="mr-2 h-4 w-4" />Vendor Dashboard</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin"><ShieldCheck className="mr-2 h-4 w-4" />Admin Dashboard</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>

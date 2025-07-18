@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -7,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { allSnacks } from "@/lib/placeholder-data";
 import { Search } from 'lucide-react';
 import { PaginationComponent } from '@/components/shared/PaginationComponent';
-import { Card, CardContent } from '@/components/ui/card';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -36,7 +36,7 @@ export default function AllSnacksPage() {
   }
 
   return (
-    <div className="bg-card">
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
             <h1 className="font-headline text-4xl font-bold tracking-tight md:text-5xl">

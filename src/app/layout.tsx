@@ -10,11 +10,6 @@ import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 
-// export const metadata: Metadata = {
-//   title: "FulaSnacks",
-//   description: "The easiest way to order snacks on campus.",
-// };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,7 +17,10 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isDashboard = pathname.startsWith('/dashboard');
-  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/payment');
+  const isAdmin = pathname.startsWith('/admin');
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/payment') || pathname.startsWith('/admin/login');
+
+  const showHeaderFooter = !isDashboard && !isAdmin && !isAuthPage;
 
   return (
     <html lang="en" className="light">
@@ -44,21 +42,16 @@ export default function RootLayout({
         <FavoritesProvider>
           <CartProvider>
               <Suspense>
-                {isDashboard || isAuthPage ? (
-                  <>
-                    {children}
-                    <Toaster />
-                  </>
-                ) : (
-                  <>
+                {showHeaderFooter ? (
                     <div className="flex min-h-screen flex-col">
                       <Header />
                       <main className="flex-1">{children}</main>
                       <Footer />
                     </div>
-                    <Toaster />
-                  </>
+                ) : (
+                  children
                 )}
+                <Toaster />
               </Suspense>
           </CartProvider>
         </FavoritesProvider>
