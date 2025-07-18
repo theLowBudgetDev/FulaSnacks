@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,11 +22,11 @@ export default function AdminOrdersPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-    const filteredOrders = userOrders.filter(order => {
+    const filteredOrders = useMemo(() => userOrders.filter(order => {
         const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) || order.userId.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
         return matchesSearch && matchesStatus;
-    });
+    }), [searchTerm, statusFilter]);
 
     const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
     const paginatedOrders = filteredOrders.slice(
