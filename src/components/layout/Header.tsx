@@ -104,7 +104,7 @@ export default function Header() {
         </div>
         
         <div className="flex items-center justify-end gap-2">
-          <Button asChild variant="ghost" size="icon" className="relative">
+          <Button asChild variant="ghost" size="icon" className="relative hover:bg-transparent">
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               {cartItemCount > 0 && (
@@ -115,7 +115,7 @@ export default function Header() {
           </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="hover:bg-transparent">
                     <Avatar className="h-8 w-8">
                         <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar"/>
                         <AvatarFallback>U</AvatarFallback>
