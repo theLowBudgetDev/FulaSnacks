@@ -1,19 +1,74 @@
 
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { allSnacks } from "@/lib/placeholder-data";
+import type { Snack } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { ProductDialog } from "@/components/dashboard/ProductDialog";
+import { DeleteProductDialog } from "@/components/dashboard/DeleteProductDialog";
+import { PaginationComponent } from "@/components/shared/PaginationComponent";
+
+const ITEMS_PER_PAGE = 5;
 
 export default function VendorProductsPage() {
-    const vendorSnacks = allSnacks.filter(snack => snack.vendorId === 'vendor-1');
+    const [products, setProducts] = useState<Snack[]>(allSnacks.filter(snack => snack.vendorId === 'vendor-1'));
+    const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Snack | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+    const paginatedProducts = products.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handleAddProduct = () => {
+        setSelectedProduct(null);
+        setIsProductDialogOpen(true);
+    };
+
+    const handleEditProduct = (product: Snack) => {
+        setSelectedProduct(product);
+        setIsProductDialogOpen(true);
+    };
+
+    const handleDeleteProduct = (product: Snack) => {
+        setSelectedProduct(product);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleSaveProduct = (productData: Omit<Snack, 'id' | 'vendorId'>) => {
+        if (selectedProduct) {
+            // Edit existing product
+            setProducts(products.map(p => p.id === selectedProduct.id ? { ...selectedProduct, ...productData } : p));
+        } else {
+            // Add new product
+            const newProduct: Snack = {
+                id: `snack-${Date.now()}`,
+                ...productData,
+                vendorId: 'vendor-1' // Assuming a static vendor for now
+            };
+            setProducts([newProduct, ...products]);
+        }
+    };
     
+    const confirmDeleteProduct = () => {
+        if(selectedProduct) {
+            setProducts(products.filter(p => p.id !== selectedProduct.id));
+        }
+    }
+
+
   return (
+    <>
     <Card>
         <CardHeader>
             <div className="flex items-center justify-between">
@@ -21,7 +76,7 @@ export default function VendorProductsPage() {
                     <CardTitle>Your Products</CardTitle>
                     <CardDescription>Manage your snack offerings.</CardDescription>
                 </div>
-                <Button>
+                <Button onClick={handleAddProduct}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Add Product
                 </Button>
@@ -43,7 +98,7 @@ export default function VendorProductsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vendorSnacks.map(snack => (
+            {paginatedProducts.map(snack => (
                 <TableRow key={snack.id}>
                     <TableCell className="hidden sm:table-cell">
                         <Image
@@ -70,8 +125,9 @@ export default function VendorProductsPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEditProduct(snack)}>Edit</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteProduct(snack)}>Delete</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </TableCell>
@@ -80,6 +136,28 @@ export default function VendorProductsPage() {
           </TableBody>
         </Table>
       </CardContent>
+      <CardFooter>
+        <PaginationComponent 
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+        />
+      </CardFooter>
     </Card>
+
+    <ProductDialog 
+        open={isProductDialogOpen}
+        onOpenChange={setIsProductDialogOpen}
+        onSave={handleSaveProduct}
+        product={selectedProduct}
+    />
+
+    <DeleteProductDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={confirmDeleteProduct}
+        productName={selectedProduct?.name}
+    />
+    </>
   );
 }

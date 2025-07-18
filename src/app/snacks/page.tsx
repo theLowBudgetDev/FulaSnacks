@@ -6,10 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { allSnacks } from "@/lib/placeholder-data";
 import { Search } from 'lucide-react';
+import { PaginationComponent } from '@/components/shared/PaginationComponent';
+import { Card, CardContent } from '@/components/ui/card';
+
+const ITEMS_PER_PAGE = 8;
 
 export default function AllSnacksPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const categories = ['all', ...Array.from(new Set(allSnacks.map(s => s.category)))];
 
@@ -18,6 +23,17 @@ export default function AllSnacksPage() {
     const matchesCategory = category === 'all' || snack.category === category;
     return matchesSearch && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredSnacks.length / ITEMS_PER_PAGE);
+  const paginatedSnacks = filteredSnacks.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  }
 
   return (
     <div className="bg-card">
@@ -39,10 +55,16 @@ export default function AllSnacksPage() {
                     placeholder="Search for snacks..."
                     className="pl-10"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setCurrentPage(1); // Reset to first page on search
+                    }}
                 />
             </div>
-            <Select value={category} onValueChange={setCategory}>
+            <Select value={category} onValueChange={(value) => {
+                setCategory(value);
+                setCurrentPage(1); // Reset to first page on filter change
+            }}>
                 <SelectTrigger className="w-full md:w-[200px]">
                     <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -54,9 +76,9 @@ export default function AllSnacksPage() {
             </Select>
         </div>
 
-        {filteredSnacks.length > 0 ? (
+        {paginatedSnacks.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {filteredSnacks.map((snack) => (
+                {paginatedSnacks.map((snack) => (
                     <SnackCard key={snack.id} snack={snack} />
                 ))}
             </div>
@@ -66,6 +88,13 @@ export default function AllSnacksPage() {
                 <p className="text-muted-foreground">Try adjusting your search or filters.</p>
             </div>
         )}
+        <div className="mt-12 flex justify-center">
+             <PaginationComponent 
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+            />
+        </div>
       </div>
     </div>
   );

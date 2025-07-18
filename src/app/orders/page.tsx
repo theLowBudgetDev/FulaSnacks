@@ -5,14 +5,20 @@ import type { Order } from "@/lib/types";
 import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText } from "lucide-react";
 import { OrderDetailDialog } from "@/components/shared/OrderDetailDialog";
+import { PaginationComponent } from "@/components/shared/PaginationComponent";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [activePage, setActivePage] = useState(1);
+  const [pastPage, setPastPage] = useState(1);
+
 
   const activeOrders = userOrders.filter(
     (order) => order.status === "Preparing" || order.status === "Ready for Pickup"
@@ -20,6 +26,19 @@ export default function OrdersPage() {
   const pastOrders = userOrders.filter(
     (order) => order.status === "Completed" || order.status === "Cancelled"
   );
+
+  const activeTotalPages = Math.ceil(activeOrders.length / ITEMS_PER_PAGE);
+  const paginatedActiveOrders = activeOrders.slice(
+      (activePage - 1) * ITEMS_PER_PAGE,
+      activePage * ITEMS_PER_PAGE
+  );
+
+  const pastTotalPages = Math.ceil(pastOrders.length / ITEMS_PER_PAGE);
+  const paginatedPastOrders = pastOrders.slice(
+      (pastPage - 1) * ITEMS_PER_PAGE,
+      pastPage * ITEMS_PER_PAGE
+  );
+
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -36,7 +55,7 @@ export default function OrdersPage() {
     }
   };
 
-  const OrderTable = ({ orders }: { orders: typeof userOrders }) => (
+  const OrderTable = ({ orders, totalPages, currentPage, onPageChange }: { orders: typeof userOrders, totalPages: number, currentPage: number, onPageChange: (page: number) => void }) => (
     <Card>
       <CardContent className="p-0">
         <Table>
@@ -77,6 +96,15 @@ export default function OrdersPage() {
           </TableBody>
         </Table>
       </CardContent>
+      {totalPages > 1 && (
+        <CardFooter>
+            <PaginationComponent 
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={onPageChange}
+            />
+        </CardFooter>
+      )}
     </Card>
   );
 
@@ -98,10 +126,10 @@ export default function OrdersPage() {
             <TabsTrigger value="past">Past Orders</TabsTrigger>
           </TabsList>
           <TabsContent value="active" className="mt-6">
-            <OrderTable orders={activeOrders} />
+            <OrderTable orders={paginatedActiveOrders} totalPages={activeTotalPages} currentPage={activePage} onPageChange={setActivePage} />
           </TabsContent>
           <TabsContent value="past" className="mt-6">
-            <OrderTable orders={pastOrders} />
+            <OrderTable orders={paginatedPastOrders} totalPages={pastTotalPages} currentPage={pastPage} onPageChange={setPastPage} />
           </TabsContent>
         </Tabs>
       </div>

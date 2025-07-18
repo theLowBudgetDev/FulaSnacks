@@ -4,14 +4,24 @@ import { useState } from 'react';
 import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import type { Order } from '@/lib/types';
+import { PaginationComponent } from '@/components/shared/PaginationComponent';
+
+const ITEMS_PER_PAGE = 10;
 
 export default function VendorOrdersPage() {
     const [orders, setOrders] = useState<Order[]>(userOrders.filter(order => order.items.some(item => item.snack.vendorId === 'vendor-1')));
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+    const paginatedOrders = orders.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     const handleStatusChange = (orderId: string, newStatus: Order['status']) => {
         setOrders(currentOrders => currentOrders.map(order => order.id === orderId ? {...order, status: newStatus} : order));
@@ -54,7 +64,7 @@ export default function VendorOrdersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map(order => (
+            {paginatedOrders.map(order => (
                 <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.id}</TableCell>
                     <TableCell>Customer Name</TableCell>
@@ -86,6 +96,13 @@ export default function VendorOrdersPage() {
           </TableBody>
         </Table>
       </CardContent>
+       <CardFooter>
+        <PaginationComponent 
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+        />
+      </CardFooter>
     </Card>
   );
 }

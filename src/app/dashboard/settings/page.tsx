@@ -1,9 +1,29 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+
+  const handleSaveChanges = () => {
+    toast({
+      title: "Settings Saved",
+      description: "Your profile details have been updated.",
+    });
+  };
+
+  const handleUpdatePassword = () => {
+    toast({
+      title: "Password Updated",
+      description: "Your password has been changed successfully.",
+    });
+  };
+
+
   return (
     <div className="space-y-6">
         <Card>
@@ -20,7 +40,7 @@ export default function SettingsPage() {
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" defaultValue="vendor@fulafia.edu.ng" />
                 </div>
-                <Button>Save Changes</Button>
+                <Button onClick={handleSaveChanges}>Save Changes</Button>
             </CardContent>
         </Card>
         <Card>
@@ -41,7 +61,7 @@ export default function SettingsPage() {
                     <Label htmlFor="confirm-password">Confirm New Password</Label>
                     <Input id="confirm-password" type="password" />
                 </div>
-                <Button>Update Password</Button>
+                <Button onClick={handleUpdatePassword}>Update Password</Button>
             </CardContent>
         </Card>
     </div>
