@@ -1,4 +1,3 @@
-"use client";
 import Link from 'next/link';
 import {
   Card,
@@ -170,7 +169,7 @@ export default async function AdminDashboardPage() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `₦${value/1000}k`}
+                  tickFormatter={(value) => `₦${Number(value)/1000}k`}
                 />
                 <Bar
                   dataKey="total"
