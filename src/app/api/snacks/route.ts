@@ -13,7 +13,6 @@ export async function GET(req: Request) {
     const where: any = {
       name: {
         contains: searchTerm,
-        mode: 'insensitive',
       },
       vendor: {
         isApproved: true,
