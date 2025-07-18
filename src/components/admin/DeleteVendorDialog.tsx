@@ -33,8 +33,8 @@ export function DeleteVendorDialog({ open, onOpenChange, onConfirm, vendorName }
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the vendor 
-            <span className="font-semibold"> {vendorName}</span> and all associated data.
+            This action cannot be undone. This will permanently delete the vendor account for 
+            <span className="font-semibold"> {vendorName}</span> and all associated data including products, orders, and reviews.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

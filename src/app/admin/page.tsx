@@ -1,6 +1,4 @@
 
-"use client";
-
 import Link from 'next/link';
 import {
   Card,
@@ -34,17 +32,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { userOrders, vendors, allUsers } from "@/lib/placeholder-data";
-
-const salesData = [
-  { name: "Mon", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Tue", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Wed", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Thu", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Fri", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Sat", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Sun", total: Math.floor(Math.random() * 5000) + 1000 },
-];
+import { prisma } from '@/lib/prisma';
+import { format, subDays } from 'date-fns';
 
 const getStatusVariant = (status: string) => {
     switch (status) {
@@ -61,9 +50,50 @@ const getStatusVariant = (status: string) => {
     }
 };
 
-export default function AdminDashboardPage() {
-  const recentOrders = userOrders.slice(0, 5);
-  const totalRevenue = userOrders.reduce((sum, order) => sum + order.total, 0);
+export default async function AdminDashboardPage() {
+  const sevenDaysAgo = subDays(new Date(), 7);
+
+  const totalRevenue = await prisma.order.aggregate({
+    where: { status: 'Completed' },
+    _sum: { total: true },
+  });
+
+  const totalUsers = await prisma.user.count();
+  const activeVendors = await prisma.vendor.count({ where: { isApproved: true } });
+  const totalOrdersCount = await prisma.order.count();
+
+  const recentOrders = await prisma.order.findMany({
+    take: 5,
+    orderBy: { createdAt: 'desc' },
+    include: { user: true },
+  });
+
+  const weeklySales = await prisma.order.findMany({
+    where: {
+      createdAt: { gte: sevenDaysAgo },
+      status: 'Completed',
+    },
+    select: {
+      createdAt: true,
+      total: true,
+    },
+  });
+
+  const salesData = Array.from({ length: 7 }).map((_, i) => {
+    const date = subDays(new Date(), 6 - i);
+    return {
+      name: format(date, 'EEE'),
+      total: 0,
+    };
+  });
+
+  weeklySales.forEach(sale => {
+    const dayName = format(sale.createdAt, 'EEE');
+    const day = salesData.find(d => d.name === dayName);
+    if (day) {
+      day.total += sale.total;
+    }
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -74,7 +104,7 @@ export default function AdminDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₦{totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">₦{(totalRevenue._sum.total || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Across all vendors
             </p>
@@ -86,7 +116,7 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{allUsers.length}</div>
+            <div className="text-2xl font-bold">{totalUsers}</div>
             <p className="text-xs text-muted-foreground">
               Customers and Vendors
             </p>
@@ -98,7 +128,7 @@ export default function AdminDashboardPage() {
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{vendors.filter(v => v.isApproved).length}</div>
+            <div className="text-2xl font-bold">{activeVendors}</div>
             <p className="text-xs text-muted-foreground">
               Total approved vendors
             </p>
@@ -110,7 +140,7 @@ export default function AdminDashboardPage() {
             <Utensils className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userOrders.length}</div>
+            <div className="text-2xl font-bold">{totalOrdersCount}</div>
             <p className="text-xs text-muted-foreground">
               In platform history
             </p>
@@ -171,9 +201,9 @@ export default function AdminDashboardPage() {
                     {recentOrders.map((order) => (
                         <TableRow key={order.id}>
                             <TableCell>
-                                <div className="font-medium">{order.id}</div>
+                                <div className="font-medium">{order.id.substring(0,8)}...</div>
                                 <div className="hidden text-sm text-muted-foreground md:inline">
-                                    {order.userId}
+                                    {order.user.email}
                                 </div>
                             </TableCell>
                             <TableCell>

@@ -1,53 +1,40 @@
 
-export interface Review {
-  id: string;
-  userId: string;
-  userName: string;
-  rating: number; // 1 to 5
-  comment: string;
-  date: string;
-}
+import type { Prisma } from '@prisma/client';
 
-export interface Snack {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  vendorId: string;
-  category: string;
-  reviews: Review[];
-}
+export type User = Prisma.UserGetPayload<{}>;
 
-export interface Vendor {
-  id: string;
-  name: string;
-  description: string;
-  logoUrl: string;
-  campusLocation: string;
-  reviews: Review[];
-  isApproved: boolean;
-}
+export type Vendor = Prisma.VendorGetPayload<{
+  include: {
+    user: true;
+    products: true;
+  };
+}>;
 
-export interface CartItem {
+export type Snack = Prisma.SnackGetPayload<{
+  include: {
+    vendor: { include: { user: true } };
+    reviews: { include: { user: true } };
+  };
+}>;
+
+export type Review = Prisma.ReviewGetPayload<{
+  include: {
+    user: true;
+  };
+}>;
+
+export type Order = Prisma.OrderGetPayload<{
+  include: {
+    items: {
+      include: {
+        snack: true;
+      };
+    };
+    user: true;
+  };
+}>;
+
+export type CartItem = {
   snack: Snack;
   quantity: number;
-}
-
-export interface Order {
-  id: string;
-  userId: string;
-  items: CartItem[];
-  total: number;
-  status: 'Placed' | 'Preparing' | 'Ready for Pickup' | 'Completed' | 'Cancelled';
-  orderDate: string;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatarUrl: string;
-  role: 'customer' | 'vendor' | 'admin';
-  createdAt: string;
-}
+};

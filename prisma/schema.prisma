@@ -1,20 +1,92 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
+  name      String
   password  String
-  role      String   @default("CUSTOMER") // Changed from Role enum to String
+  role      String   @default("CUSTOMER") // "CUSTOMER", "VENDOR", "ADMIN"
   createdAt DateTime @default(now())
+  avatarUrl String?
+
+  orders  Order[]
+  reviews Review[]
+  vendor  Vendor?
+}
+
+model Vendor {
+  id               String  @id @default(cuid())
+  description      String
+  logoUrl          String?
+  campusLocation   String
+  isApproved       Boolean @default(false)
+  userId           String  @unique
+  user             User    @relation(fields: [userId], references: [id])
+  
+  products Snack[]
+}
+
+model Snack {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  imageUrl    String
+  category    String
+  createdAt   DateTime @default(now())
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  orderItems OrderItem[]
+  reviews    Review[]
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  total     Float
+  status    String   // "Preparing", "Ready for Pickup", "Completed", "Cancelled"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  quantity  Int
+  price     Float // Price of the snack at the time of order
+  snackId   String
+  orderId   String
+
+  snack Snack @relation(fields: [snackId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@unique([snackId, orderId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int // 1 to 5
+  comment   String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  snackId String
+  snack   Snack  @relation(fields: [snackId], references: [id])
+  
+  @@unique([userId, snackId])
 }

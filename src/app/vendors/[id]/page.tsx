@@ -1,22 +1,41 @@
 
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { vendors, allSnacks } from '@/lib/placeholder-data';
+import { prisma } from '@/lib/prisma';
 import SnackCard from '@/components/shared/SnackCard';
 import { MapPin, Star } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { format } from 'date-fns';
 
-export default function VendorDetailPage({ params }: { params: { id: string } }) {
-  const vendor = vendors.find((v) => v.id === params.id);
-  const snacks = allSnacks.filter((s) => s.vendorId === params.id);
+export default async function VendorDetailPage({ params }: { params: { id: string } }) {
+  const vendor = await prisma.vendor.findUnique({
+    where: { id: params.id, isApproved: true },
+    include: {
+      user: true,
+      products: {
+        include: {
+          vendor: { include: { user: true } },
+          reviews: { include: { user: true } },
+        }
+      },
+    },
+  });
 
   if (!vendor) {
     notFound();
   }
-  
-  const averageRating = vendor.reviews.reduce((acc, review) => acc + review.rating, 0) / vendor.reviews.length;
 
+  const reviews = await prisma.review.findMany({
+    where: { snack: { vendorId: vendor.id } },
+    include: { user: true },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  });
+
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+    : 0;
 
   return (
     <div>
@@ -24,27 +43,27 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <Image
-              src={vendor.logoUrl}
-              alt={`${vendor.name} logo`}
+              src={vendor.logoUrl || 'https://placehold.co/150x150.png'}
+              alt={`${vendor.user.name} logo`}
               width={150}
               height={150}
               className="rounded-full border-4 border-background shadow-lg"
               data-ai-hint="logo cooking"
             />
             <div className="text-center md:text-left">
-              <h1 className="font-headline text-4xl font-bold md:text-5xl">{vendor.name}</h1>
+              <h1 className="font-headline text-4xl font-bold md:text-5xl">{vendor.user.name}</h1>
               <p className="mt-2 text-lg text-muted-foreground max-w-2xl">{vendor.description}</p>
               <div className="mt-4 flex items-center justify-center md:justify-start gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
                     <span>{vendor.campusLocation}</span>
                 </div>
-                {vendor.reviews.length > 0 && (
+                {reviews.length > 0 && (
                  <>
                     <Separator orientation="vertical" className="h-5"/>
                     <div className="flex items-center gap-1.5 text-amber-500 font-medium">
                         <Star className="h-5 w-5 fill-current" />
-                        <span>{averageRating.toFixed(1)} ({vendor.reviews.length} reviews)</span>
+                        <span>{averageRating.toFixed(1)} ({reviews.length} reviews)</span>
                     </div>
                  </>
                 )}
@@ -59,11 +78,11 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="md:col-span-3">
                 <h2 className="font-headline text-3xl font-bold mb-8">
-                    Snacks from {vendor.name}
+                    Snacks from {vendor.user.name}
                 </h2>
-                {snacks.length > 0 ? (
+                {vendor.products.length > 0 ? (
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {snacks.map((snack) => (
+                    {vendor.products.map((snack) => (
                         <SnackCard key={snack.id} snack={snack} />
                     ))}
                     </div>
@@ -75,19 +94,20 @@ export default function VendorDetailPage({ params }: { params: { id: string } })
                  <h2 className="font-headline text-3xl font-bold mb-8">
                     Reviews
                 </h2>
-                {vendor.reviews.length > 0 ? (
+                {reviews.length > 0 ? (
                     <Card>
                         <CardContent className="p-6 space-y-6">
-                            {vendor.reviews.map(review => (
+                            {reviews.map(review => (
                                 <div key={review.id}>
                                     <div className="flex items-center justify-between">
-                                        <p className="font-semibold">{review.userName}</p>
+                                        <p className="font-semibold">{review.user.name}</p>
                                         <div className="flex items-center gap-1 text-amber-500">
                                             {[...Array(5)].map((_, i) => (
                                                 <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'fill-current' : ''}`} />
                                             ))}
                                         </div>
                                     </div>
+                                    <p className="text-xs text-muted-foreground mt-1">{format(new Date(review.createdAt), "PPP")}</p>
                                     <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
                                 </div>
                             ))}

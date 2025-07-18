@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
-import { allUsers } from "@/lib/placeholder-data";
+import { useState, useEffect } from 'react';
 import type { User } from '@/lib/types';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,37 +15,63 @@ import { useToast } from '@/hooks/use-toast';
 import { UserProfileDialog } from '@/components/admin/UserProfileDialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminUsersPage() {
-    const [users, setUsers] = useState<User[]>(allUsers);
-    const [currentPage, setCurrentPage] = useState(1);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { toast } = useToast();
+    
+    const [users, setUsers] = useState<User[]>([]);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [loading, setLoading] = useState(true);
+    
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [roleFilter, setRoleFilter] = useState('all');
-    const { toast } = useToast();
 
-    const filteredUsers = useMemo(() => {
-        return allUsers.filter(user => {
-            const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-            return matchesSearch && matchesRole;
-        });
-    }, [searchTerm, roleFilter]);
+    const searchTerm = searchParams.get('search') || '';
+    const roleFilter = searchParams.get('role') || 'all';
+    const currentPage = Number(searchParams.get('page') || '1');
 
-    const paginatedUsers = useMemo(() => {
-        return filteredUsers.slice(
-            (currentPage - 1) * ITEMS_PER_PAGE,
-            currentPage * ITEMS_PER_PAGE
-        );
-    }, [filteredUsers, currentPage]);
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setLoading(true);
+            const params = new URLSearchParams({
+                search: searchTerm,
+                role: roleFilter,
+                page: String(currentPage),
+                limit: String(ITEMS_PER_PAGE),
+            });
+            // const res = await fetch(`/api/admin/users?${params.toString()}`);
+            // const data = await res.json();
+            // setUsers(data.users);
+            // setTotalUsers(data.total);
+            setLoading(false);
+        };
+        fetchUsers();
+    }, [searchTerm, roleFilter, currentPage]);
     
-    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(totalUsers / ITEMS_PER_PAGE);
+
+    const handleSearch = (term: string) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('search', term);
+        params.set('page', '1');
+        router.push(`/admin/users?${params.toString()}`);
+    }
+
+    const handleFilter = (role: string) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('role', role);
+        params.set('page', '1');
+        router.push(`/admin/users?${params.toString()}`);
+    }
     
     const getRoleVariant = (role: string) => {
-        switch (role) {
+        switch (role.toLowerCase()) {
             case 'admin': return 'destructive';
             case 'vendor': return 'default';
             case 'customer': return 'secondary';
@@ -89,25 +114,19 @@ export default function AdminUsersPage() {
                     type="search"
                     placeholder="Search by name or email..."
                     className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setCurrentPage(1);
-                    }}
+                    defaultValue={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
                 />
             </div>
-            <Select value={roleFilter} onValueChange={(value) => {
-                setRoleFilter(value);
-                setCurrentPage(1);
-            }}>
+            <Select value={roleFilter} onValueChange={handleFilter}>
                 <SelectTrigger className="w-full md:w-[200px]">
                     <SelectValue placeholder="Filter by role" />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="customer">Customer</SelectItem>
-                    <SelectItem value="vendor">Vendor</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="CUSTOMER">Customer</SelectItem>
+                    <SelectItem value="VENDOR">Vendor</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
                 </SelectContent>
             </Select>
         </div>
@@ -124,11 +143,17 @@ export default function AdminUsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedUsers.map(user => (
+            {loading ? (
+                Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell colSpan={5}><Skeleton className="h-10 w-full" /></TableCell>
+                    </TableRow>
+                ))
+            ) : users.map(user => (
                 <TableRow key={user.id}>
                     <TableCell className="font-medium flex items-center gap-3">
                         <Avatar>
-                            <AvatarImage src={user.avatarUrl} alt={user.name} />
+                            <AvatarImage src={user.avatarUrl || ''} alt={user.name} />
                             <AvatarFallback>
                                 <UserIcon />
                             </AvatarFallback>
@@ -159,7 +184,7 @@ export default function AdminUsersPage() {
                     </TableCell>
                 </TableRow>
             ))}
-             {paginatedUsers.length === 0 && (
+             {users.length === 0 && !loading && (
                 <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                         No users found.
@@ -173,7 +198,6 @@ export default function AdminUsersPage() {
         <PaginationComponent 
             totalPages={totalPages}
             currentPage={currentPage}
-            onPageChange={setCurrentPage}
         />
       </CardFooter>
     </Card>

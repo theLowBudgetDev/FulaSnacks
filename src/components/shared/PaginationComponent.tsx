@@ -1,6 +1,7 @@
 
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Pagination,
   PaginationContent,
@@ -14,10 +15,22 @@ import {
 interface PaginationComponentProps {
   totalPages: number;
   currentPage: number;
-  onPageChange: (page: number) => void;
 }
 
-export function PaginationComponent({ totalPages, currentPage, onPageChange }: PaginationComponentProps) {
+export function PaginationComponent({ totalPages, currentPage }: PaginationComponentProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const onPageChange = (page: number) => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    current.set("page", page.toString());
+    const search = current.toString();
+    const query = search ? `?${search}` : "";
+    router.push(`${pathname}${query}`);
+  };
+
+
   const pageNumbers = [];
   const maxPagesToShow = 5;
 
