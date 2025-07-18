@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { userOrders } from "@/lib/placeholder-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,9 +54,11 @@ export default function OrdersPage() {
                   </TableCell>
                   <TableCell className="text-right">₦{order.total.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      <FileText className="h-4 w-4 mr-2" />
-                      View Details
+                    <Button asChild variant="ghost" size="sm">
+                      <Link href={`/orders/${order.id}`}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Details
+                      </Link>
                     </Button>
                   </TableCell>
                 </TableRow>

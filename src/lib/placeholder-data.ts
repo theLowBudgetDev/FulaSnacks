@@ -106,6 +106,60 @@ export const allSnacks: Snack[] = [
     vendorId: 'vendor-3',
     category: 'Grills',
   },
+  {
+    id: 'snack-10',
+    name: 'Sausage Roll',
+    description: 'A savory pastry with a seasoned sausage filling.',
+    price: 250,
+    imageUrl: 'https://placehold.co/600x400.png',
+    vendorId: 'vendor-1',
+    category: 'Pastries',
+  },
+  {
+    id: 'snack-11',
+    name: 'Watermelon Juice',
+    description: 'Pure, refreshing, and hydrating watermelon juice.',
+    price: 500,
+    imageUrl: 'https://placehold.co/600x400.png',
+    vendorId: 'vendor-2',
+    category: 'Drinks',
+  },
+  {
+    id: 'snack-12',
+    name: 'Grilled Fish',
+    description: 'Whole tilapia fish marinated and grilled over charcoal.',
+    price: 2500,
+    imageUrl: 'https://placehold.co/600x400.png',
+    vendorId: 'vendor-3',
+    category: 'Grills',
+  },
+   {
+    id: 'snack-13',
+    name: 'Coca-Cola',
+    description: 'Classic Coca-Cola beverage.',
+    price: 200,
+    imageUrl: 'https://placehold.co/600x400.png',
+    vendorId: 'vendor-2',
+    category: 'Beverages',
+  },
+  {
+    id: 'snack-14',
+    name: 'Fanta',
+    description: 'Orange-flavored soda.',
+    price: 200,
+    imageUrl: 'https://placehold.co/600x400.png',
+    vendorId: 'vendor-2',
+    category: 'Beverages',
+  },
+   {
+    id: 'snack-15',
+    name: 'Bottled Water',
+    description: '50cl bottled spring water.',
+    price: 100,
+    imageUrl: 'https://placehold.co/600x400.png',
+    vendorId: 'vendor-2',
+    category: 'Beverages',
+  },
 ];
 
 export const featuredSnacks: Snack[] = allSnacks.slice(0, 4);
@@ -141,4 +195,25 @@ export const userOrders: Order[] = [
     status: 'Preparing',
     orderDate: new Date().toISOString(),
   },
+  {
+    id: 'ORD-004',
+    userId: 'user-123',
+    items: [
+        { snack: allSnacks[8], quantity: 1 },
+        { snack: allSnacks[11], quantity: 1 },
+    ],
+    total: 3300,
+    status: 'Ready for Pickup',
+    orderDate: new Date(Date.now() - 86400000 * 1).toISOString(), // 1 day ago
+  },
+  {
+    id: 'ORD-005',
+    userId: 'user-123',
+    items: [
+        { snack: allSnacks[10], quantity: 3 },
+    ],
+    total: 1500,
+    status: 'Cancelled',
+    orderDate: new Date(Date.now() - 86400000 * 3).toISOString(), // 3 days ago
+  }
 ];

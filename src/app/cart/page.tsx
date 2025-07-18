@@ -1,20 +1,43 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { userOrders } from "@/lib/placeholder-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, Trash2 } from "lucide-react";
-import type { CartItem } from "@/lib/types";
+import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CartPage() {
-  const cartItems: CartItem[] = userOrders.find(o => o.status === 'Preparing')?.items || [];
+  const { cart, removeFromCart, clearCart } = useCart();
+  const router = useRouter();
+  const { toast } = useToast();
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.snack.price * item.quantity, 0);
+  const subtotal = cart.reduce((acc, item) => acc + item.snack.price * item.quantity, 0);
   const deliveryFee = 200;
   const total = subtotal + deliveryFee;
+
+  const handleCheckout = () => {
+    if (cart.length > 0) {
+      toast({
+        title: "Order Placed!",
+        description: "You will be redirected to the payment gateway.",
+      });
+      // In a real app, you would redirect to a payment processor
+      // and then create an order on success.
+      clearCart();
+      router.push('/orders');
+    } else {
+      toast({
+        variant: 'destructive',
+        title: "Cannot proceed",
+        description: "Your cart is empty.",
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -27,7 +50,7 @@ export default function CartPage() {
         </p>
       </div>
       
-      {cartItems.length > 0 ? (
+      {cart.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
             <Card>
@@ -36,7 +59,7 @@ export default function CartPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-4">
-                  {cartItems.map(item => (
+                  {cart.map(item => (
                     <div key={item.snack.id} className="flex items-center gap-4">
                       <Image 
                         src={item.snack.imageUrl} 
@@ -54,7 +77,7 @@ export default function CartPage() {
                          <Input type="number" value={item.quantity} className="w-16 h-9 text-center" readOnly />
                       </div>
                       <p className="font-semibold w-20 text-right">₦{(item.snack.price * item.quantity).toLocaleString()}</p>
-                      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
+                      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.snack.id)}>
                           <Trash2 className="h-4 w-4"/>
                       </Button>
                     </div>
@@ -90,7 +113,7 @@ export default function CartPage() {
                        <p className="text-sm text-muted-foreground">
                            You will be redirected to our secure payment gateway to complete your purchase.
                        </p>
-                       <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" size="lg">
+                       <Button onClick={handleCheckout} className="w-full bg-accent text-accent-foreground hover:bg-accent/90" size="lg">
                            <CreditCard className="mr-2 h-5 w-5" />
                            Proceed to Payment
                        </Button>

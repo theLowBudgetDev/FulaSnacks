@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { Snack, Vendor } from "@/lib/types";
+import type { Snack } from "@/lib/types";
 import { vendors } from "@/lib/placeholder-data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/context/CartContext";
 
 interface SnackCardProps {
   snack: Snack;
@@ -15,9 +16,11 @@ interface SnackCardProps {
 
 export default function SnackCard({ snack }: SnackCardProps) {
   const { toast } = useToast();
+  const { addToCart } = useCart();
   const vendor = vendors.find((v) => v.id === snack.vendorId);
 
   const handleAddToCart = () => {
+    addToCart(snack);
     toast({
       title: "Added to cart!",
       description: `${snack.name} has been added to your cart.`,

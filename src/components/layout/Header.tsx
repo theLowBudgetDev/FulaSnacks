@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -7,12 +6,13 @@ import {
   User,
   UtensilsCrossed,
   Menu,
-  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/context/CartContext";
+import { Badge } from "@/components/ui/badge";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -22,6 +22,8 @@ const navLinks = [
 
 export default function Header() {
   const pathname = usePathname();
+  const { cart } = useCart();
+  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link
@@ -37,8 +39,41 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
+      <div className="container flex h-16 items-center">
+        <div className="flex items-center gap-6 md:hidden">
+            <Sheet>
+                <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                </Button>
+                </SheetTrigger>
+                <SheetContent side="left">
+                <div className="flex flex-col gap-6 p-6">
+                    <Link href="/" className="flex items-center gap-2">
+                    <UtensilsCrossed className="h-6 w-6 text-primary" />
+                    <span className="font-headline text-lg font-bold">FulaSnacks</span>
+                    </Link>
+                    <nav className="flex flex-col gap-4">
+                    {navLinks.map((link) => (
+                        <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                            "text-lg font-medium transition-colors hover:text-primary",
+                            pathname === link.href ? "text-primary" : "text-foreground"
+                        )}
+                        >
+                        {link.label}
+                        </Link>
+                    ))}
+                    </nav>
+                </div>
+                </SheetContent>
+            </Sheet>
+        </div>
+
+        <div className="hidden md:flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
               <UtensilsCrossed className="h-6 w-6 text-primary" />
               <span className="hidden font-headline text-lg font-bold sm:inline-block">FulaSnacks</span>
@@ -50,10 +85,13 @@ export default function Header() {
             </nav>
         </div>
         
-        <div className="flex items-center justify-end gap-2">
-          <Button asChild variant="ghost" size="icon">
+        <div className="flex flex-1 items-center justify-end gap-2">
+          <Button asChild variant="ghost" size="icon" className="relative">
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">{cartItemCount}</Badge>
+              )}
               <span className="sr-only">Cart</span>
             </Link>
           </Button>
@@ -63,36 +101,6 @@ export default function Header() {
               <span className="sr-only">Login</span>
             </Link>
           </Button>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <div className="flex flex-col gap-6 p-6">
-                <Link href="/" className="flex items-center gap-2">
-                  <UtensilsCrossed className="h-6 w-6 text-primary" />
-                  <span className="font-headline text-lg font-bold">FulaSnacks</span>
-                </Link>
-                <nav className="flex flex-col gap-4">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        "text-lg font-medium transition-colors hover:text-primary",
-                        pathname === link.href ? "text-primary" : "text-foreground"
-                      )}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </header>
