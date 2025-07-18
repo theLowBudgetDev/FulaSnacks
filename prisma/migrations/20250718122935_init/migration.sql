@@ -6,6 +6,7 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'CUSTOMER',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
     "avatarUrl" TEXT
 );
 
@@ -16,8 +17,10 @@ CREATE TABLE "Vendor" (
     "logoUrl" TEXT,
     "campusLocation" TEXT NOT NULL,
     "isApproved" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
     "userId" TEXT NOT NULL,
-    CONSTRAINT "Vendor_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Vendor_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -29,6 +32,7 @@ CREATE TABLE "Snack" (
     "imageUrl" TEXT NOT NULL,
     "category" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
     "vendorId" TEXT NOT NULL,
     CONSTRAINT "Snack_vendorId_fkey" FOREIGN KEY ("vendorId") REFERENCES "Vendor" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -36,10 +40,10 @@ CREATE TABLE "Snack" (
 -- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "total" REAL NOT NULL,
-    "status" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
+    "total" REAL NOT NULL,
+    "status" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -49,17 +53,17 @@ CREATE TABLE "OrderItem" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "quantity" INTEGER NOT NULL,
     "price" REAL NOT NULL,
-    "snackId" TEXT NOT NULL,
     "orderId" TEXT NOT NULL,
-    CONSTRAINT "OrderItem_snackId_fkey" FOREIGN KEY ("snackId") REFERENCES "Snack" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "snackId" TEXT NOT NULL,
+    CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "OrderItem_snackId_fkey" FOREIGN KEY ("snackId") REFERENCES "Snack" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "Review" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "rating" INTEGER NOT NULL,
-    "comment" TEXT NOT NULL,
+    "comment" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
     "snackId" TEXT NOT NULL,
