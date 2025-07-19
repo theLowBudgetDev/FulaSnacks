@@ -23,4 +23,7 @@ export async function GET(req: Request) {
     orderBy: { createdAt: "desc" },
     include: { user: true },
   });
-  const
+  const total = await prisma.vendor.count({ where });
+
+  return NextResponse.json({ vendors, total });
+}
