@@ -24,7 +24,7 @@ async function main() {
       name: 'Admin User',
       password: hashedPassword,
       role: 'ADMIN',
-      avatarUrl: 'https://placehold.co/100x100.png',
+      avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
     },
   })
 
@@ -34,7 +34,7 @@ async function main() {
       name: 'Alex Doe',
       password: hashedPassword,
       role: 'CUSTOMER',
-      avatarUrl: 'https://placehold.co/100x100.png',
+      avatarUrl: 'https://randomuser.me/api/portraits/men/45.jpg',
     },
   })
 
@@ -44,7 +44,7 @@ async function main() {
       name: 'Jane Smith',
       password: hashedPassword,
       role: 'CUSTOMER',
-      avatarUrl: 'https://placehold.co/100x100.png',
+      avatarUrl: 'https://randomuser.me/api/portraits/women/22.jpg',
     },
   })
 
@@ -54,7 +54,7 @@ async function main() {
       name: 'Mama Put Delights',
       password: hashedPassword,
       role: 'VENDOR',
-      avatarUrl: 'https://placehold.co/100x100.png',
+      avatarUrl: 'https://randomuser.me/api/portraits/women/65.jpg',
     },
   })
 
@@ -64,7 +64,7 @@ async function main() {
       name: 'Juice & Smoothie Bar',
       password: hashedPassword,
       role: 'VENDOR',
-      avatarUrl: 'https://placehold.co/100x100.png',
+      avatarUrl: 'https://randomuser.me/api/portraits/men/78.jpg',
     },
   })
   
@@ -74,7 +74,7 @@ async function main() {
       name: 'Campus Grills',
       password: hashedPassword,
       role: 'VENDOR',
-      avatarUrl: 'https://placehold.co/100x100.png',
+      avatarUrl: 'https://randomuser.me/api/portraits/women/42.jpg',
     },
   })
 
@@ -83,7 +83,7 @@ async function main() {
     data: {
       userId: vendorUser1.id,
       description: 'Serving the best home-style Nigerian snacks on campus. From puff-puff to meat pie, we have it all!',
-      logoUrl: 'https://placehold.co/400x400.png',
+      logoUrl: 'https://images.unsplash.com/photo-1606843046080-45bf7a23c39f?q=80&w=400&h=400&auto=format&fit=crop',
       campusLocation: 'Faculty of Arts Complex',
       isApproved: true,
     },
@@ -93,7 +93,7 @@ async function main() {
     data: {
       userId: vendorUser2.id,
       description: 'Freshly squeezed juices and healthy smoothies to keep you refreshed and energized throughout the day.',
-      logoUrl: 'https://placehold.co/400x400.png',
+      logoUrl: 'https://images.unsplash.com/photo-1622597467836-f3e6707e1191?q=80&w=400&h=400&auto=format&fit=crop',
       campusLocation: 'University Library Entrance',
       isApproved: true,
     },
@@ -103,7 +103,7 @@ async function main() {
     data: {
         userId: vendorUser3.id,
         description: 'Hot and spicy grilled chicken, beef, and fish. The perfect treat after a long day of lectures.',
-        logoUrl: 'https://placehold.co/400x400.png',
+        logoUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=400&h=400&auto=format&fit=crop',
         campusLocation: 'Student Union Building (SUB)',
         isApproved: false,
     }
@@ -116,7 +116,7 @@ async function main() {
       name: 'Meat Pie',
       description: 'A delicious pastry filled with minced meat and vegetables.',
       price: 300,
-      imageUrl: 'https://placehold.co/600x400.png',
+      imageUrl: 'https://images.unsplash.com/photo-1604478579007-7c86933934fd?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Pastries',
       vendorId: vendor1.id,
     },
@@ -127,7 +127,7 @@ async function main() {
       name: 'Puff-Puff (4pcs)',
       description: 'Sweet, fluffy, deep-fried dough balls. A classic Nigerian treat.',
       price: 200,
-      imageUrl: 'https://placehold.co/600x400.png',
+      imageUrl: 'https://images.unsplash.com/photo-1630976244030-8c75066e9c88?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Pastries',
       vendorId: vendor1.id,
     },
@@ -138,7 +138,7 @@ async function main() {
       name: 'Pineapple & Ginger Juice',
       description: 'A refreshing blend of sweet pineapple and spicy ginger.',
       price: 500,
-      imageUrl: 'https://placehold.co/600x400.png',
+      imageUrl: 'https://images.unsplash.com/photo-1615478503562-ec2d8aa0e24e?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Drinks',
       vendorId: vendor2.id,
     },
@@ -149,7 +149,7 @@ async function main() {
       name: 'Grilled Chicken Lap',
       description: 'Juicy and tender chicken lap grilled to perfection with our secret spices.',
       price: 1200,
-      imageUrl: 'https://placehold.co/600x400.png',
+      imageUrl: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Grills',
       vendorId: vendor3.id,
     },
@@ -162,7 +162,7 @@ async function main() {
         name: `Samosa Pack #${i + 1}`,
         description: 'Crispy pastry filled with spiced potatoes and peas.',
         price: 250 + i * 10,
-        imageUrl: 'https://placehold.co/600x400.png',
+        imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=600&h=400&auto=format&fit=crop',
         category: 'Small Chops',
         vendorId: vendor1.id,
       },
@@ -172,7 +172,7 @@ async function main() {
         name: `Watermelon Juice #${i + 1}`,
         description: 'Pure, refreshing, and hydrating watermelon juice.',
         price: 500 + i * 10,
-        imageUrl: 'https://placehold.co/600x400.png',
+        imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?q=80&w=600&h=400&auto=format&fit=crop',
         category: 'Drinks',
         vendorId: vendor2.id,
       },

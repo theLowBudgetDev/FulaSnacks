@@ -119,7 +119,7 @@ export default function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="hover:bg-transparent">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={user?.image || "https://placehold.co/100x100.png"} alt={user?.name || "User"} data-ai-hint="person avatar"/>
+                        <AvatarImage src={user?.image || "https://randomuser.me/api/portraits/lego/1.jpg"} alt={user?.name || "User"} data-ai-hint="person avatar"/>
                         <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                     <span className="sr-only">User Menu</span>
