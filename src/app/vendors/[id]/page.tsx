@@ -42,7 +42,7 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <Image
-              src={vendor.logoUrl || 'https://placehold.co/150x150.png'}
+              src={vendor.logoUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=150&h=150&auto=format&fit=crop'}
               alt={`${vendor.user.name} logo`}
               width={150}
               height={150}

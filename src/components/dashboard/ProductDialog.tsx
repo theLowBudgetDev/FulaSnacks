@@ -38,7 +38,7 @@ export function ProductDialog({ open, onOpenChange, onSave, product }: ProductDi
       setDescription('');
       setPrice('');
       setCategory('');
-      setImageUrl('https://placehold.co/600x400.png');
+      setImageUrl('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=600&h=400&auto=format&fit=crop');
     }
   }, [product, open]);
 

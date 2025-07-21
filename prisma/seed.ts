@@ -24,7 +24,7 @@ async function main() {
       name: 'Admin User',
       password: hashedPassword,
       role: 'ADMIN',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+      avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=256&h=256&auto=format&fit=crop',
     },
   })
 
@@ -34,7 +34,7 @@ async function main() {
       name: 'Alex Doe',
       password: hashedPassword,
       role: 'CUSTOMER',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/45.jpg',
+      avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=256&h=256&auto=format&fit=crop',
     },
   })
 
@@ -44,7 +44,7 @@ async function main() {
       name: 'Jane Smith',
       password: hashedPassword,
       role: 'CUSTOMER',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/22.jpg',
+      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop',
     },
   })
 
@@ -54,7 +54,7 @@ async function main() {
       name: 'Mama Put Delights',
       password: hashedPassword,
       role: 'VENDOR',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/65.jpg',
+      avatarUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=256&h=256&auto=format&fit=crop',
     },
   })
 
@@ -64,7 +64,7 @@ async function main() {
       name: 'Juice & Smoothie Bar',
       password: hashedPassword,
       role: 'VENDOR',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/78.jpg',
+      avatarUrl: 'https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=256&h=256&auto=format&fit=crop',
     },
   })
   
@@ -74,7 +74,7 @@ async function main() {
       name: 'Campus Grills',
       password: hashedPassword,
       role: 'VENDOR',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/42.jpg',
+      avatarUrl: 'https://images.unsplash.com/photo-1583394293214-28ded15ee548?q=80&w=256&h=256&auto=format&fit=crop',
     },
   })
 
@@ -83,7 +83,7 @@ async function main() {
     data: {
       userId: vendorUser1.id,
       description: 'Serving the best home-style Nigerian snacks on campus. From puff-puff to meat pie, we have it all!',
-      logoUrl: 'https://images.unsplash.com/photo-1606843046080-45bf7a23c39f?q=80&w=400&h=400&auto=format&fit=crop',
+      logoUrl: 'https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?q=80&w=400&h=400&auto=format&fit=crop',
       campusLocation: 'Faculty of Arts Complex',
       isApproved: true,
     },
@@ -93,7 +93,7 @@ async function main() {
     data: {
       userId: vendorUser2.id,
       description: 'Freshly squeezed juices and healthy smoothies to keep you refreshed and energized throughout the day.',
-      logoUrl: 'https://images.unsplash.com/photo-1622597467836-f3e6707e1191?q=80&w=400&h=400&auto=format&fit=crop',
+      logoUrl: 'https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?q=80&w=400&h=400&auto=format&fit=crop',
       campusLocation: 'University Library Entrance',
       isApproved: true,
     },
@@ -103,7 +103,7 @@ async function main() {
     data: {
         userId: vendorUser3.id,
         description: 'Hot and spicy grilled chicken, beef, and fish. The perfect treat after a long day of lectures.',
-        logoUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=400&h=400&auto=format&fit=crop',
+        logoUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=400&h=400&auto=format&fit=crop',
         campusLocation: 'Student Union Building (SUB)',
         isApproved: false,
     }
@@ -116,7 +116,7 @@ async function main() {
       name: 'Meat Pie',
       description: 'A delicious pastry filled with minced meat and vegetables.',
       price: 300,
-      imageUrl: 'https://images.unsplash.com/photo-1604478579007-7c86933934fd?q=80&w=600&h=400&auto=format&fit=crop',
+      imageUrl: 'https://images.unsplash.com/photo-1621510456681-2330135e5871?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Pastries',
       vendorId: vendor1.id,
     },
@@ -127,7 +127,7 @@ async function main() {
       name: 'Puff-Puff (4pcs)',
       description: 'Sweet, fluffy, deep-fried dough balls. A classic Nigerian treat.',
       price: 200,
-      imageUrl: 'https://images.unsplash.com/photo-1630976244030-8c75066e9c88?q=80&w=600&h=400&auto=format&fit=crop',
+      imageUrl: 'https://images.unsplash.com/photo-1603532648955-039310d9ed75?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Pastries',
       vendorId: vendor1.id,
     },
@@ -138,7 +138,7 @@ async function main() {
       name: 'Pineapple & Ginger Juice',
       description: 'A refreshing blend of sweet pineapple and spicy ginger.',
       price: 500,
-      imageUrl: 'https://images.unsplash.com/photo-1615478503562-ec2d8aa0e24e?q=80&w=600&h=400&auto=format&fit=crop',
+      imageUrl: 'https://images.unsplash.com/photo-1546171753-97d7676e4602?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Drinks',
       vendorId: vendor2.id,
     },
@@ -149,7 +149,7 @@ async function main() {
       name: 'Grilled Chicken Lap',
       description: 'Juicy and tender chicken lap grilled to perfection with our secret spices.',
       price: 1200,
-      imageUrl: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=600&h=400&auto=format&fit=crop',
+      imageUrl: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?q=80&w=600&h=400&auto=format&fit=crop',
       category: 'Grills',
       vendorId: vendor3.id,
     },
@@ -172,7 +172,7 @@ async function main() {
         name: `Watermelon Juice #${i + 1}`,
         description: 'Pure, refreshing, and hydrating watermelon juice.',
         price: 500 + i * 10,
-        imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?q=80&w=600&h=400&auto=format&fit=crop',
+        imageUrl: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=600&h=400&auto=format&fit=crop',
         category: 'Drinks',
         vendorId: vendor2.id,
       },

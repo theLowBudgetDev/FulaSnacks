@@ -27,7 +27,7 @@ export default async function VendorCard({ vendor }: VendorCardProps) {
       <Card className="group flex flex-col h-full overflow-hidden transition-all hover:shadow-lg hover:border-primary">
         <CardHeader className="flex flex-row items-start gap-4">
           <Image
-            src={vendor.logoUrl || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=100&h=100&auto=format&fit=crop'}
+            src={vendor.logoUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=100&h=100&auto=format&fit=crop'}
             alt={`${vendor.user.name} logo`}
             width={64}
             height={64}

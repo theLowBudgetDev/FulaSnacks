@@ -66,7 +66,7 @@ export default function ProfilePage() {
     <div className="container mx-auto px-4 py-16">
         <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
             <Avatar className="h-32 w-32 border-4 border-primary">
-                <AvatarImage src={user?.avatarUrl || "https://placehold.co/100x100.png"} alt={user?.name || "User"} data-ai-hint="person avatar"/>
+                <AvatarImage src={user?.avatarUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&h=100&auto=format&fit=crop"} alt={user?.name || "User"} data-ai-hint="person avatar"/>
                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
             <div className="text-center md:text-left">
