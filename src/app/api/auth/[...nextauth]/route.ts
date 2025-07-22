@@ -3,7 +3,6 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import type { User } from '@/lib/types';
 
 const handler = NextAuth({
   providers: [
@@ -35,12 +34,8 @@ const handler = NextAuth({
           throw new Error('Invalid credentials');
         }
         
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
+        // Return the full user object for the JWT callback
+        return user;
       },
     }),
   ],
@@ -48,7 +43,8 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role;
+        token.role = user.role;
+        token.avatarUrl = user.avatarUrl;
       }
       return token;
     },
@@ -56,6 +52,7 @@ const handler = NextAuth({
       if (session?.user) {
         (session.user as any).id = token.id as string;
         (session.user as any).role = token.role as string;
+        (session.user as any).avatarUrl = token.avatarUrl as string;
       }
       return session;
     },

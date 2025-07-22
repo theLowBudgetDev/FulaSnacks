@@ -12,52 +12,77 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import type { Snack } from "@/lib/types";
+import type { Snack, User } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 export default function ProfilePage() {
     const { data: session, update } = useSession();
     const { toast } = useToast();
     const { favorites } = useFavorites();
     const [favoriteSnacks, setFavoriteSnacks] = useState<Snack[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loadingFavorites, setLoadingFavorites] = useState(true);
+    const [loadingProfile, setLoadingProfile] = useState(false);
     
     const [name, setName] = useState(session?.user?.name || "");
+    const [avatarUrl, setAvatarUrl] = useState((session?.user as any)?.avatarUrl || "");
 
     useEffect(() => {
-        if (session?.user?.name) {
-            setName(session.user.name);
+        if (session?.user) {
+            setName(session.user.name || "");
+            setAvatarUrl((session.user as any).avatarUrl || "");
         }
     }, [session]);
 
     useEffect(() => {
-        if (favorites.length > 0) {
-            // In a real app, you'd fetch this from an API
-            const fetchFavorites = async () => {
-                setLoading(true);
-                // This would be an API call, e.g., fetch('/api/snacks/favorites', { method: 'POST', body: JSON.stringify({ ids: favorites }) })
-                // const res = await fetch(`/api/snacks/byIds?ids=${favorites.join(',')}`);
-                // const snacks = await res.json();
-                // setFavoriteSnacks(snacks);
-                setLoading(false);
-            };
-            fetchFavorites();
-        } else {
-            setLoading(false);
-        }
+        const fetchFavorites = async () => {
+            if (favorites.length > 0) {
+                setLoadingFavorites(true);
+                try {
+                    const res = await fetch(`/api/snacks/byIds?ids=${favorites.join(',')}`);
+                    if (!res.ok) throw new Error("Failed to fetch favorites");
+                    const snacks = await res.json();
+                    setFavoriteSnacks(snacks);
+                } catch (error) {
+                    console.error("Failed to fetch favorite snacks", error);
+                } finally {
+                    setLoadingFavorites(false);
+                }
+            } else {
+                setFavoriteSnacks([]);
+                setLoadingFavorites(false);
+            }
+        };
+        fetchFavorites();
     }, [favorites]);
     
-    const handleUpdateProfile = async () => {
-        // API call to update user profile
-        // e.g., await fetch('/api/user/profile', { method: 'PUT', body: JSON.stringify({ name }) })
-        
-        // Update the session locally
-        await update({ name });
-        
-        toast({
-            title: "Profile Updated",
-            description: "Your account details have been saved."
-        });
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoadingProfile(true);
+        try {
+            const res = await fetch('/api/user/profile', { 
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, avatarUrl }) 
+            });
+            if (!res.ok) throw new Error("Failed to update profile");
+            
+            // Update the session locally to reflect changes immediately
+            await update({ name, avatarUrl });
+            
+            toast({
+                title: "Profile Updated",
+                description: "Your account details have been saved."
+            });
+        } catch(error) {
+             toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Could not update your profile."
+            });
+        } finally {
+            setLoadingProfile(false);
+        }
     }
 
     const user = session?.user as any;
@@ -66,7 +91,7 @@ export default function ProfilePage() {
     <div className="container mx-auto px-4 py-16">
         <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
             <Avatar className="h-32 w-32 border-4 border-primary">
-                <AvatarImage src={user?.avatarUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&h=100&auto=format&fit=crop"} alt={user?.name || "User"} data-ai-hint="person avatar"/>
+                <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || "User"} data-ai-hint="person avatar"/>
                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
             <div className="text-center md:text-left">
@@ -87,7 +112,7 @@ export default function ProfilePage() {
                         <CardDescription>The snacks you love the most, all in one place.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {loading ? (
+                        {loadingFavorites ? (
                             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                                 {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
                             </div>
@@ -109,16 +134,31 @@ export default function ProfilePage() {
                         <CardTitle>Edit Profile</CardTitle>
                         <CardDescription>Update your personal information.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4 max-w-lg">
-                        <div className="space-y-2">
-                            <Label htmlFor="fullname">Full Name</Label>
-                            <Input id="fullname" value={name} onChange={(e) => setName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" type="email" value={user?.email || ''} disabled />
-                        </div>
-                        <Button onClick={handleUpdateProfile}>Save Changes</Button>
+                    <CardContent className="max-w-lg">
+                       <form onSubmit={handleUpdateProfile} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="fullname">Full Name</Label>
+                                <Input id="fullname" value={name} onChange={(e) => setName(e.target.value)} disabled={loadingProfile}/>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="avatarUrl">Avatar URL</Label>
+                                <Input id="avatarUrl" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} disabled={loadingProfile}/>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email Address</Label>
+                                <Input id="email" type="email" value={user?.email || ''} disabled />
+                            </div>
+                            <Button type="submit" disabled={loadingProfile}>
+                                {loadingProfile ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    "Save Changes"
+                                )}
+                            </Button>
+                        </form>
                     </CardContent>
                 </Card>
             </TabsContent>

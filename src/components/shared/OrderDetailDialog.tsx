@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import Image from "next/image";
@@ -25,13 +24,13 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'PREPARING':
+      case 'Preparing':
         return 'secondary';
-      case 'READY_FOR_PICKUP':
+      case 'Ready for Pickup':
         return 'default';
-      case 'COMPLETED':
+      case 'Completed':
         return 'outline';
-      case 'CANCELLED':
+      case 'Cancelled':
         return 'destructive';
       default:
         return 'outline';
@@ -40,13 +39,13 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-        case 'PREPARING':
+        case 'Preparing':
             return <Clock className="h-4 w-4" />;
-        case 'READY_FOR_PICKUP':
+        case 'Ready for Pickup':
             return <Truck className="h-4 w-4" />;
-        case 'COMPLETED':
+        case 'Completed':
             return <CheckCircle className="h-4 w-4 text-green-500" />;
-        case 'CANCELLED':
+        case 'Cancelled':
             return <XCircle className="h-4 w-4" />;
         default:
             return <Clock className="h-4 w-4" />;
@@ -74,7 +73,7 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
             </div>
           <div className="flex flex-col gap-4 max-h-60 overflow-y-auto pr-4">
             {order.items.map((item) => (
-              <div key={item.snack.id} className="flex items-start gap-4">
+              <div key={item.id} className="flex items-start gap-4">
                 <Image
                   src={item.snack.imageUrl}
                   alt={item.snack.name}
@@ -90,7 +89,7 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
                   </p>
                 </div>
                 <p className="font-semibold text-right">
-                  ₦{(item.snack.price * item.quantity).toLocaleString()}
+                  ₦{(item.price * item.quantity).toLocaleString()}
                 </p>
               </div>
             ))}

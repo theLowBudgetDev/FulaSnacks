@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import type { Snack } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +15,13 @@ import { ProductDialog } from "@/components/dashboard/ProductDialog";
 import { DeleteProductDialog } from "@/components/dashboard/DeleteProductDialog";
 import { PaginationComponent } from "@/components/shared/PaginationComponent";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 const ITEMS_PER_PAGE = 5;
 
 export default function VendorProductsPage() {
-    const router = useRouter();
     const searchParams = useSearchParams();
+    const { toast } = useToast();
     const [products, setProducts] = useState<Snack[]>([]);
     const [totalProducts, setTotalProducts] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -31,24 +32,27 @@ export default function VendorProductsPage() {
     
     const currentPage = Number(searchParams.get('page')) || 1;
     
-    useEffect(() => {
-        async function fetchProducts() {
-            setLoading(true);
-            try {
-                 const params = new URLSearchParams({
-                    page: String(currentPage),
-                    limit: String(ITEMS_PER_PAGE)
-                });
-                const response = await fetch(`/api/dashboard/products?${params.toString()}`);
-                const data = await response.json();
-                setProducts(data.products || []);
-                setTotalProducts(data.total || 0);
-            } catch (error) {
-                console.error('Failed to fetch products:', error);
-            } finally {
-                setLoading(false);
-            }
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+                const params = new URLSearchParams({
+                page: String(currentPage),
+                limit: String(ITEMS_PER_PAGE)
+            });
+            const response = await fetch(`/api/dashboard/products?${params.toString()}`);
+            if (!response.ok) throw new Error("Failed to fetch products");
+            const data = await response.json();
+            setProducts(data.products || []);
+            setTotalProducts(data.total || 0);
+        } catch (error) {
+            console.error('Failed to fetch products:', error);
+            toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch products.' });
+        } finally {
+            setLoading(false);
         }
+    }
+
+    useEffect(() => {
         fetchProducts();
     }, [currentPage]);
 
@@ -69,31 +73,58 @@ export default function VendorProductsPage() {
         setIsDeleteDialogOpen(true);
     };
 
-    const handleSaveProduct = (productData: Omit<Snack, 'id' | 'vendorId' | 'reviews' | 'vendor' | 'createdAt' | 'updatedAt'>) => {
-        if (selectedProduct) {
-            // Edit existing product
-            // In a real app, this would be an API call
-            setProducts(products.map(p => p.id === selectedProduct.id ? { ...selectedProduct, ...productData } : p));
-        } else {
-            // Add new product
-            // In a real app, this would be an API call that returns the new product with ID
-            const newProduct: Snack = {
-                id: `snack-${Date.now()}`,
-                ...productData,
-                vendorId: 'vendor-1', // Placeholder
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                vendor: {} as any, // Placeholder
-                reviews: [] // Placeholder
-            };
-            setProducts([newProduct, ...products]);
+    const handleSaveProduct = async (productData: Omit<Snack, 'id' | 'vendorId' | 'reviews' | 'vendor' | 'createdAt' | 'updatedAt'>) => {
+        const isEditing = !!selectedProduct;
+        const url = isEditing ? `/api/dashboard/products/${selectedProduct.id}` : '/api/dashboard/products';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData),
+            });
+
+            if (!response.ok) {
+                throw new Error(isEditing ? 'Failed to update product' : 'Failed to create product');
+            }
+            
+            toast({
+                title: `Product ${isEditing ? 'Updated' : 'Created'}`,
+                description: `"${productData.name}" has been successfully saved.`
+            });
+
+            fetchProducts(); // Refresh the list
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: `Could not save product. ${error instanceof Error ? error.message : ''}`
+            });
         }
     };
     
-    const confirmDeleteProduct = () => {
+    const confirmDeleteProduct = async () => {
         if(selectedProduct) {
-            // In a real app, this would be a DELETE API call
-            setProducts(products.filter(p => p.id !== selectedProduct.id));
+            try {
+                const response = await fetch(`/api/dashboard/products/${selectedProduct.id}`, {
+                    method: 'DELETE',
+                });
+                if (!response.ok) throw new Error('Failed to delete product');
+                
+                toast({
+                    title: "Product Deleted",
+                    description: `"${selectedProduct.name}" has been removed.`
+                });
+                
+                fetchProducts(); // Refresh the list
+            } catch (error) {
+                 toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: 'Could not delete product.'
+                });
+            }
         }
     }
 

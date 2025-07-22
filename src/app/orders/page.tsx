@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,45 +14,45 @@ import { PaginationComponent } from '@/components/shared/PaginationComponent';
 import { ReviewDialog } from '@/components/shared/ReviewDialog';
 import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSearchParams } from 'next/navigation';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 5;
 
 export default function OrdersPage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [totalOrders, setTotalOrders] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [reviewSnack, setReviewSnack] = useState<Snack | null>(null);
-  const [activePage, setActivePage] = useState(1);
-  const [pastPage, setPastPage] = useState(1);
+
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const currentTab = searchParams.get('tab') || 'active';
 
   useEffect(() => {
     const fetchOrders = async () => {
       if (session?.user) {
         setLoading(true);
-        // In a real app, this would be an API call to `/api/orders`
-        // For now, we simulate. In your app, you would fetch from an API route.
-        // const res = await fetch('/api/orders');
-        // const userOrders = await res.json();
-        // setOrders(userOrders);
+        const params = new URLSearchParams({
+          page: String(currentPage),
+          limit: String(ITEMS_PER_PAGE),
+          status: currentTab === 'active' ? 'active' : 'past'
+        });
+        const res = await fetch(`/api/orders?${params.toString()}`);
+        if(res.ok) {
+            const data = await res.json();
+            setOrders(data.orders);
+            setTotalOrders(data.total);
+        }
         setLoading(false);
       }
     };
     fetchOrders();
-  }, [session]);
+  }, [session, currentPage, currentTab]);
 
-  const activeOrders = orders.filter(
-    (order) => order.status === 'Preparing' || order.status === 'Ready for Pickup'
-  );
-  const pastOrders = orders.filter(
-    (order) => order.status === 'Completed' || order.status === 'Cancelled'
-  );
 
-  const activeTotalPages = Math.ceil(activeOrders.length / ITEMS_PER_PAGE);
-  const paginatedActiveOrders = activeOrders.slice((activePage - 1) * ITEMS_PER_PAGE, activePage * ITEMS_PER_PAGE);
-
-  const pastTotalPages = Math.ceil(pastOrders.length / ITEMS_PER_PAGE);
-  const paginatedPastOrders = pastOrders.slice((pastPage - 1) * ITEMS_PER_PAGE, pastPage * ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(totalOrders / ITEMS_PER_PAGE);
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -69,7 +70,7 @@ export default function OrdersPage() {
     setSelectedOrder(null);
   };
 
-  const OrderTable = ({ orders, totalPages, currentPage, onPageChange, isLoading }: { orders: Order[]; totalPages: number; currentPage: number; onPageChange: (page: number) => void; isLoading: boolean }) => (
+  const OrderTable = ({ orders, isLoading }: { orders: Order[]; isLoading: boolean }) => (
     <Card>
       <CardContent className="p-0">
         <Table>
@@ -147,10 +148,10 @@ export default function OrdersPage() {
             <TabsTrigger value="past">Past Orders</TabsTrigger>
           </TabsList>
           <TabsContent value="active" className="mt-6">
-            <OrderTable orders={paginatedActiveOrders} totalPages={activeTotalPages} currentPage={activePage} onPageChange={setActivePage} isLoading={loading} />
+            <OrderTable orders={orders} isLoading={loading} />
           </TabsContent>
           <TabsContent value="past" className="mt-6">
-            <OrderTable orders={paginatedPastOrders} totalPages={pastTotalPages} currentPage={pastPage} onPageChange={setPastPage} isLoading={loading} />
+            <OrderTable orders={orders} isLoading={loading} />
           </TabsContent>
         </Tabs>
       </div>

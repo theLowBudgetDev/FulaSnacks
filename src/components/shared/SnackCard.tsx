@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/context/CartContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 interface SnackCardProps {
   snack: Snack;
@@ -18,6 +19,7 @@ interface SnackCardProps {
 
 export default function SnackCard({ snack }: SnackCardProps) {
   const { toast } = useToast();
+  const { data: session } = useSession();
   const { addToCart } = useCart();
   const { favorites, toggleFavorite } = useFavorites();
   const vendor = snack.vendor;
@@ -34,6 +36,14 @@ export default function SnackCard({ snack }: SnackCardProps) {
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!session) {
+        toast({
+            variant: 'destructive',
+            title: "Please log in",
+            description: "You need to be logged in to add favorites."
+        });
+        return;
+    }
     toggleFavorite(snack.id);
      toast({
       title: isFavorite ? "Removed from favorites" : "Added to favorites",
@@ -41,7 +51,13 @@ export default function SnackCard({ snack }: SnackCardProps) {
     });
   }
   
-  const averageRating = snack.reviews.length > 0 ? snack.reviews.reduce((acc, review) => acc + review.rating, 0) / snack.reviews.length : 0;
+  const averageRating = snack.reviews && snack.reviews.length > 0 
+    ? snack.reviews.reduce((acc, review) => acc + review.rating, 0) / snack.reviews.length 
+    : 0;
+
+  if (!vendor || !vendor.user) {
+    return null; // Or a loading/error state
+  }
 
   return (
     <Card className="flex flex-col overflow-hidden transition-all hover:shadow-lg">
@@ -68,7 +84,7 @@ export default function SnackCard({ snack }: SnackCardProps) {
       <CardContent className="flex-grow p-4">
         <div className="flex justify-between items-start">
             <CardTitle className="font-headline text-lg mb-1">{snack.name}</CardTitle>
-            {snack.reviews.length > 0 && (
+            {averageRating > 0 && (
                 <div className="flex items-center gap-1 text-sm font-medium text-amber-500">
                     <Star className="h-4 w-4 fill-current" />
                     <span>{averageRating.toFixed(1)}</span>
