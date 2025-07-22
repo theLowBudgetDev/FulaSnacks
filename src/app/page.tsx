@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function Home() {
   const featuredSnacks = await prisma.snack.findMany({
-    take: 4,
+    take: 8,
     orderBy: {
       reviews: {
         _count: 'desc',
