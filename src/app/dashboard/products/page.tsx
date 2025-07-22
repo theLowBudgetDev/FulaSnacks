@@ -78,15 +78,25 @@ export default function VendorProductsPage() {
         const url = isEditing ? `/api/dashboard/products/${selectedProduct.id}` : '/api/dashboard/products';
         const method = isEditing ? 'PUT' : 'POST';
 
+        // Ensure only serializable data is sent
+        const payload = {
+            name: productData.name,
+            description: productData.description,
+            price: productData.price,
+            category: productData.category,
+            imageUrl: productData.imageUrl,
+        };
+
         try {
             const response = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(productData),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
-                throw new Error(isEditing ? 'Failed to update product' : 'Failed to create product');
+                const errorData = await response.json();
+                throw new Error(errorData.error || (isEditing ? 'Failed to update product' : 'Failed to create product'));
             }
             
             toast({
@@ -95,6 +105,7 @@ export default function VendorProductsPage() {
             });
 
             fetchProducts(); // Refresh the list
+            setIsProductDialogOpen(false); // Close the dialog on success
         } catch (error) {
             toast({
                 variant: 'destructive',
