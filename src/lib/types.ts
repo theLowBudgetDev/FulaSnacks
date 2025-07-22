@@ -1,3 +1,4 @@
+
 import type { Prisma } from '@prisma/client';
 
 export type User = Prisma.UserGetPayload<{}>;
@@ -32,6 +33,13 @@ export type Order = Prisma.OrderGetPayload<{
     user: true;
   };
 }>;
+
+export type OrderItem = Prisma.OrderItemGetPayload<{
+  include: {
+    snack: true,
+    order: true
+  }
+}>
 
 export type CartItem = {
   snack: Snack;

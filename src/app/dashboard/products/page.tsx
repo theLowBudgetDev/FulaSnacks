@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import type { Snack } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
@@ -14,35 +14,45 @@ import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { ProductDialog } from "@/components/dashboard/ProductDialog";
 import { DeleteProductDialog } from "@/components/dashboard/DeleteProductDialog";
 import { PaginationComponent } from "@/components/shared/PaginationComponent";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ITEMS_PER_PAGE = 5;
 
 export default function VendorProductsPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [products, setProducts] = useState<Snack[]>([]);
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [loading, setLoading] = useState(true);
+    
     const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Snack | null>(null);
-    const searchParams = useSearchParams();
+    
     const currentPage = Number(searchParams.get('page')) || 1;
     
     useEffect(() => {
         async function fetchProducts() {
+            setLoading(true);
             try {
-                const response = await fetch('/api/dashboard/products');
+                 const params = new URLSearchParams({
+                    page: String(currentPage),
+                    limit: String(ITEMS_PER_PAGE)
+                });
+                const response = await fetch(`/api/dashboard/products?${params.toString()}`);
                 const data = await response.json();
                 setProducts(data.products || []);
+                setTotalProducts(data.total || 0);
             } catch (error) {
                 console.error('Failed to fetch products:', error);
+            } finally {
+                setLoading(false);
             }
         }
         fetchProducts();
-    }, []);
+    }, [currentPage]);
 
-    const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
-    const paginatedProducts = products.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
+    const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
 
     const handleAddProduct = () => {
         setSelectedProduct(null);
@@ -59,23 +69,30 @@ export default function VendorProductsPage() {
         setIsDeleteDialogOpen(true);
     };
 
-    const handleSaveProduct = (productData: Omit<Snack, 'id' | 'vendorId' | 'reviews' | 'vendor'>) => {
+    const handleSaveProduct = (productData: Omit<Snack, 'id' | 'vendorId' | 'reviews' | 'vendor' | 'createdAt' | 'updatedAt'>) => {
         if (selectedProduct) {
             // Edit existing product
-            // setProducts(products.map(p => p.id === selectedProduct.id ? { ...selectedProduct, ...productData } : p));
+            // In a real app, this would be an API call
+            setProducts(products.map(p => p.id === selectedProduct.id ? { ...selectedProduct, ...productData } : p));
         } else {
             // Add new product
-            // const newProduct: Snack = {
-            //     id: `snack-${Date.now()}`,
-            //     ...productData,
-            //     vendorId: 'vendor-1' // Assuming a static vendor for now
-            // };
-            // setProducts([newProduct, ...products]);
+            // In a real app, this would be an API call that returns the new product with ID
+            const newProduct: Snack = {
+                id: `snack-${Date.now()}`,
+                ...productData,
+                vendorId: 'vendor-1', // Placeholder
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                vendor: {} as any, // Placeholder
+                reviews: [] // Placeholder
+            };
+            setProducts([newProduct, ...products]);
         }
     };
     
     const confirmDeleteProduct = () => {
         if(selectedProduct) {
+            // In a real app, this would be a DELETE API call
             setProducts(products.filter(p => p.id !== selectedProduct.id));
         }
     }
@@ -112,42 +129,49 @@ export default function VendorProductsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedProducts.map(snack => (
-                <TableRow key={snack.id}>
-                    <TableCell className="hidden sm:table-cell">
-                        <Image
-                        alt={snack.name}
-                        className="aspect-square rounded-md object-cover"
-                        height="64"
-                        src={snack.imageUrl}
-                        width="64"
-                        data-ai-hint="snack food"
-                        />
-                    </TableCell>
-                    <TableCell className="font-medium">{snack.name}</TableCell>
-                    <TableCell>
-                        <Badge variant="outline">{snack.category}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">₦{snack.price.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button aria-haspopup="true" size="icon" variant="ghost">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Toggle menu</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => handleEditProduct(snack)}>Edit</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteProduct(snack)}>Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </TableCell>
-                </TableRow>
-            ))}
-             {paginatedProducts.length === 0 && (
+            {loading ? (
+                Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell colSpan={5}><Skeleton className="h-12 w-full" /></TableCell>
+                    </TableRow>
+                ))
+            ) : products.length > 0 ? (
+                products.map(snack => (
+                    <TableRow key={snack.id}>
+                        <TableCell className="hidden sm:table-cell">
+                            <Image
+                            alt={snack.name}
+                            className="aspect-square rounded-md object-cover"
+                            height="64"
+                            src={snack.imageUrl}
+                            width="64"
+                            data-ai-hint="snack food"
+                            />
+                        </TableCell>
+                        <TableCell className="font-medium">{snack.name}</TableCell>
+                        <TableCell>
+                            <Badge variant="outline">{snack.category}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">₦{snack.price.toLocaleString()}</TableCell>
+                        <TableCell className="text-right">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">Toggle menu</span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuItem onClick={() => handleEditProduct(snack)}>Edit</DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteProduct(snack)}>Delete</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </TableCell>
+                    </TableRow>
+                ))
+            ) : (
                 <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                         No products found. Add one to get started.

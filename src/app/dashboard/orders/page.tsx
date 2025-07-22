@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -12,23 +11,34 @@ import { MoreHorizontal } from "lucide-react";
 import type { Order } from '@/lib/types';
 import { PaginationComponent } from '@/components/shared/PaginationComponent';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function VendorOrdersPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [orders, setOrders] = useState<Order[]>([]);
+    const [totalOrders, setTotalOrders] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
     const { toast } = useToast();
+
+    const currentPage = Number(searchParams.get('page')) || 1;
 
     useEffect(() => {
       async function fetchOrders() {
         setLoading(true);
         try {
-          // In a real app with auth, you'd fetch for a specific vendor
-          const response = await fetch('/api/dashboard/orders');
+          const params = new URLSearchParams({
+            page: String(currentPage),
+            limit: String(ITEMS_PER_PAGE)
+          });
+          const response = await fetch(`/api/dashboard/orders?${params.toString()}`);
+          if (!response.ok) throw new Error("Failed to fetch");
           const data = await response.json();
-          setOrders(data);
+          setOrders(data.orders);
+          setTotalOrders(data.total);
         } catch (error) {
           console.error("Failed to fetch orders:", error);
           toast({
@@ -41,13 +51,9 @@ export default function VendorOrdersPage() {
         }
       }
       fetchOrders();
-    }, [toast]);
+    }, [currentPage, toast]);
 
-    const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
-    const paginatedOrders = orders.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
+    const totalPages = Math.ceil(totalOrders / ITEMS_PER_PAGE);
 
     const handleStatusChange = async (orderId: string, newStatus: string) => {
         const originalOrders = [...orders];
@@ -82,13 +88,13 @@ export default function VendorOrdersPage() {
 
     const getStatusVariant = (status: string) => {
         switch (status) {
-          case 'PREPARING':
+          case 'Preparing':
             return 'secondary';
-          case 'READY_FOR_PICKUP':
+          case 'Ready for Pickup':
             return 'default';
-          case 'COMPLETED':
+          case 'Completed':
             return 'outline';
-          case 'CANCELLED':
+          case 'Cancelled':
             return 'destructive';
           default:
             return 'outline';
@@ -117,7 +123,13 @@ export default function VendorOrdersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedOrders.map(order => (
+            {loading ? (
+                 Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell colSpan={7}><Skeleton className="h-8 w-full" /></TableCell>
+                    </TableRow>
+                ))
+            ) : orders.map(order => (
                 <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.id.substring(0,8)}...</TableCell>
                     <TableCell>{order.user?.name}</TableCell>
@@ -138,15 +150,15 @@ export default function VendorOrdersPage() {
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Update Status</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'PREPARING')}>Preparing</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'READY_FOR_PICKUP')}>Ready for Pickup</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'COMPLETED')}>Completed</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'Preparing')}>Preparing</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'Ready for Pickup')}>Ready for Pickup</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatusChange(order.id, 'Completed')}>Completed</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </TableCell>
                 </TableRow>
             ))}
-             {paginatedOrders.length === 0 && (
+             {orders.length === 0 && !loading && (
                 <TableRow>
                     <TableCell colSpan={7} className="h-24 text-center">
                         No orders yet.
@@ -160,7 +172,6 @@ export default function VendorOrdersPage() {
         <PaginationComponent 
             totalPages={totalPages}
             currentPage={currentPage}
-            onPageChange={setCurrentPage}
         />
       </CardFooter>
     </Card>
