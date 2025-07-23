@@ -49,7 +49,8 @@ export default function AdminLoginPage() {
             });
             router.push('/admin');
         } else {
-            signOut({ redirect: false });
+            // If a non-admin user tries to log in here, sign them out.
+            await signOut({ redirect: false });
             toast({
               variant: 'destructive',
               title: "Access Denied",

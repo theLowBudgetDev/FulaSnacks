@@ -17,6 +17,8 @@ export default withAuth(
     }
 
     if (!token) {
+      // This part should be handled by the authorized callback below,
+      // but as a safeguard, we can return early.
       return
     }
 
@@ -28,6 +30,7 @@ export default withAuth(
     }
 
     // Vendor route protection
+    // Admins should also be able to access the vendor dashboard
     if (pathname.startsWith('/dashboard') && role !== 'VENDOR' && role !== 'ADMIN') {
         return NextResponse.redirect(new URL('/unauthorized', req.url))
     }
@@ -36,10 +39,23 @@ export default withAuth(
     callbacks: {
       authorized: ({ req, token }) => {
         const { pathname } = req.nextUrl;
-        if (pathname.startsWith('/admin') || pathname.startsWith('/dashboard') || pathname.startsWith('/profile') || pathname.startsWith('/orders') || pathname.startsWith('/cart')) {
-            return !!token
+        
+        // Define all protected routes
+        const protectedRoutes = [
+          '/admin',
+          '/dashboard',
+          '/profile',
+          '/orders',
+          '/cart',
+        ];
+
+        // If the path is a protected route, a token must exist
+        if (protectedRoutes.some(path => pathname.startsWith(path))) {
+            return !!token;
         }
-        return true
+
+        // For all other routes, access is granted
+        return true;
       },
     },
   }
@@ -47,12 +63,13 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    '/login',
-    '/signup',
-    '/admin/:path*',
-    '/dashboard/:path*',
-    '/profile',
-    '/orders',
-    '/cart',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }

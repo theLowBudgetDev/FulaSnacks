@@ -56,17 +56,16 @@ const handler = NextAuth({
       }
       return session;
     },
-    async redirect({ url, baseUrl, token }) {
-      // Redirect users based on their role
-      if (token?.role === 'ADMIN') {
-        return `${baseUrl}/admin/dashboard`;
-      } else if (token?.role === 'VENDOR') {
-        return `${baseUrl}/dashboard/vendors`;
-      } else if (token?.role === 'CUSTOMER') {
-        return `${baseUrl}/dashboard`;
-      }
-      return baseUrl;
-    },
+     async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      
+      // Allows callback URLs on the same origin
+      if (new URL(url).origin === baseUrl) return url
+
+      // Fallback to the default redirect based on role
+      return baseUrl
+    }
   },
   session: {
     strategy: 'jwt',
@@ -74,6 +73,7 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: '/login',
+    error: '/login'
   },
 });
 
