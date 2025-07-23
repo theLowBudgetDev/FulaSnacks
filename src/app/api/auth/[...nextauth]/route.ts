@@ -3,6 +3,7 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import type { User } from '@prisma/client';
 
 const handler = NextAuth({
   providers: [
@@ -34,7 +35,6 @@ const handler = NextAuth({
           throw new Error('Invalid credentials');
         }
         
-        // Return the full user object for the JWT callback
         return user;
       },
     }),
@@ -42,28 +42,35 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.avatarUrl = user.avatarUrl;
+        const u = user as User
+        token.id = u.id;
+        token.role = u.role;
+        token.avatarUrl = u.avatarUrl;
+        token.name = u.name;
+        token.email = u.email;
       }
       return token;
     },
     async session({ session, token }) {
       if (session?.user) {
-        (session.user as any).id = token.id as string;
-        (session.user as any).role = token.role as string;
-        (session.user as any).avatarUrl = token.avatarUrl as string;
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.avatarUrl = token.avatarUrl as string;
       }
       return session;
     },
      async redirect({ url, baseUrl }) {
+      const callbackUrl = new URL(url, baseUrl).searchParams.get('callbackUrl');
+      if (callbackUrl && callbackUrl.startsWith(baseUrl)) {
+        return callbackUrl;
+      }
+
       // Allows relative callback URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`
       
       // Allows callback URLs on the same origin
       if (new URL(url).origin === baseUrl) return url
 
-      // Fallback to the default redirect based on role
       return baseUrl
     }
   },

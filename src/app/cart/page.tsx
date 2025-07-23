@@ -13,18 +13,29 @@ import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { PaymentDialog } from "@/components/shared/PaymentDialog";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { data: session } = useSession();
 
   const subtotal = cart.reduce((acc, item) => acc + item.snack.price * item.quantity, 0);
   const deliveryFee = 200;
   const total = subtotal + deliveryFee;
 
   const handleCheckout = () => {
+    if (!session) {
+      toast({
+        variant: 'destructive',
+        title: "Authentication Required",
+        description: "Please log in to proceed to checkout.",
+      });
+       router.push('/login?callbackUrl=/cart');
+       return;
+    }
     if (cart.length > 0) {
       setIsPaymentDialogOpen(true);
     } else {
@@ -36,13 +47,36 @@ export default function CartPage() {
     }
   };
   
-  const handlePaymentSuccess = () => {
-     toast({
-      title: "Payment Successful!",
-      description: "Your order has been placed.",
-    });
-    clearCart();
-    router.push('/orders');
+  const handlePaymentSuccess = async () => {
+     try {
+       const res = await fetch('/api/orders', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           cart: cart,
+           total: total,
+         }),
+       });
+
+       if (!res.ok) {
+         throw new Error('Failed to create order');
+       }
+
+       toast({
+         title: "Payment Successful!",
+         description: "Your order has been placed.",
+       });
+       clearCart();
+       router.push('/orders');
+     } catch (error) {
+       toast({
+         variant: 'destructive',
+         title: "Order Failed",
+         description: "There was a problem placing your order.",
+       });
+     }
   }
 
   return (
@@ -62,7 +96,7 @@ export default function CartPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Cart Items</CardTitle>
+                <CardTitle>Cart Items ({cart.reduce((acc, item) => acc + item.quantity, 0)})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-4">
@@ -155,4 +189,3 @@ export default function CartPage() {
     </>
   );
 }
-
