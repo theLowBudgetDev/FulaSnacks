@@ -56,6 +56,17 @@ const handler = NextAuth({
       }
       return session;
     },
+    async redirect({ url, baseUrl, token }) {
+      // Redirect users based on their role
+      if (token?.role === 'ADMIN') {
+        return `${baseUrl}/admin/dashboard`;
+      } else if (token?.role === 'VENDOR') {
+        return `${baseUrl}/dashboard/vendors`;
+      } else if (token?.role === 'CUSTOMER') {
+        return `${baseUrl}/dashboard`;
+      }
+      return baseUrl;
+    },
   },
   session: {
     strategy: 'jwt',
