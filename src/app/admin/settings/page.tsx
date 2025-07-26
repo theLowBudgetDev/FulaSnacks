@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 
@@ -18,27 +18,63 @@ export default function AdminSettingsPage() {
   const [platformLoading, setPlatformLoading] = useState(false);
   
   // Form states
-  const [adminName, setAdminName] = useState("Admin User");
-  const [adminEmail, setAdminEmail] = useState("admin@fulafia.edu.ng");
+  const [adminName, setAdminName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [commissionRate, setCommissionRate] = useState(5);
-  const [deliveryFee, setDeliveryFee] = useState(200);
-  const [enableNotifications, setEnableNotifications] = useState(true);
-  const [enableAutoApproval, setEnableAutoApproval] = useState(false);
+  const [commissionRate, setCommissionRate] = useState<number | undefined>(undefined);
+  const [deliveryFee, setDeliveryFee] = useState<number | undefined>(undefined);
+  const [enableNotifications, setEnableNotifications] = useState<boolean | undefined>(undefined);
+  const [enableAutoApproval, setEnableAutoApproval] = useState<boolean | undefined>(undefined);
+
+  // Fetch settings on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch('/api/admin/settings');
+        const data = await res.json();
+        setAdminName(data.admin?.name || '');
+        setAdminEmail(data.admin?.email || '');
+        setCommissionRate(data.commissionRate);
+        setDeliveryFee(data.deliveryFee);
+        setEnableNotifications(data.enableNotifications);
+        setEnableAutoApproval(data.enableAutoApproval);
+      } catch (err) {
+        toast({ title: 'Error', description: 'Failed to load settings', variant: 'destructive' });
+      }
+      setIsLoading(false);
+    };
+    fetchSettings();
+  }, []);
 
   const handleSaveChanges = async () => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          adminName,
+          adminEmail,
+          commissionRate,
+          deliveryFee,
+          enableNotifications,
+          enableAutoApproval,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to save settings');
+      toast({
+        title: "Settings Saved",
+        description: "Your admin details have been updated.",
+      });
+    } catch (err) {
+      toast({ title: 'Error', description: 'Failed to save settings', variant: 'destructive' });
+    }
     setIsLoading(false);
-    
-    toast({
-      title: "Settings Saved",
-      description: "Your admin details have been updated.",
-    });
   };
+
 
   const handleUpdatePassword = async () => {
     // Validate passwords

@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 
 export default async function VendorDetailPage({ params }: { params: { id: string } }) {
   const vendor = await prisma.vendor.findUnique({
-    where: { id: params.id, isApproved: true },
+    where: { id: params.id },
     include: {
       user: true,
       products: {

@@ -91,13 +91,46 @@ export default function AdminUsersPage() {
         });
     };
 
-    const handleSuspendUser = (user: User) => {
-        toast({
-            variant: "destructive",
-            title: "User Suspended",
-            description: `${user.name} (${user.email}) has been suspended.`,
-        });
+    const handleSuspendUser = async (user: User) => {
+        try {
+            const res = await fetch(`/api/admin/users/${user.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ suspended: true }),
+            });
+            if (!res.ok) throw new Error('Failed to suspend user');
+            setUsers(users.map(u => u.id === user.id ? { ...u, suspended: true } : u));
+            toast({
+                variant: "destructive",
+                title: "User Suspended",
+                description: `${user.name} (${user.email}) has been suspended.`,
+            });
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'Failed to suspend user.',
+                variant: 'destructive',
+            });
+        }
     };
+
+    const handleChangeRole = async (user: User) => {
+        // Cycle roles: CUSTOMER → VENDOR → ADMIN → CUSTOMER
+        const nextRole = user.role === 'CUSTOMER' ? 'VENDOR' : user.role === 'VENDOR' ? 'ADMIN' : 'CUSTOMER';
+        try {
+            const res = await fetch(`/api/admin/users/${user.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: nextRole }),
+            });
+            if (!res.ok) throw new Error('Failed to change role');
+            setUsers(users.map(u => u.id === user.id ? { ...u, role: nextRole } : u));
+            toast({ title: 'Role Changed', description: `${user.name} is now ${nextRole}.` });
+        } catch (error) {
+            toast({ title: 'Error', description: 'Failed to change role.', variant: 'destructive' });
+        }
+    };
+
 
   return (
     <>
@@ -178,6 +211,23 @@ export default function AdminUsersPage() {
                                 <DropdownMenuItem onClick={() => handleViewProfile(user)}>View Profile</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleResetPassword(user)}>Reset Password</DropdownMenuItem>
                                 <DropdownMenuSeparator />
+                                <DropdownMenuLabel>Change Role</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleChangeRole(user)}>Change Role</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={async () => {
+                                  if (window.confirm(`Are you sure you want to delete ${user.name}? This cannot be undone.`)) {
+                                    try {
+                                      const res = await fetch(`/api/admin/users/${user.id}`, {
+                                        method: 'DELETE',
+                                      });
+                                      if (!res.ok) throw new Error('Failed to delete user');
+                                      setUsers(users.filter(u => u.id !== user.id));
+                                      toast({ title: 'User Deleted', description: `${user.name} has been deleted.` });
+                                    } catch (error) {
+                                      toast({ title: 'Error', description: 'Failed to delete user.', variant: 'destructive' });
+                                    }
+                                  }
+                                }}>Delete User</DropdownMenuItem>
                                 <DropdownMenuItem className="text-destructive" onClick={() => handleSuspendUser(user)}>Suspend User</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

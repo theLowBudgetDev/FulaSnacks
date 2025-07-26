@@ -75,17 +75,17 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
             {order.items.map((item) => (
               <div key={item.id} className="flex items-start gap-4">
                 <Image
-                  src={item.snack.imageUrl}
-                  alt={item.snack.name}
+                  src={item.snack?.imageUrl || "/placeholder_snack.png"}
+                  alt={item.snack?.name || "Unknown Snack"}
                   width={64}
                   height={64}
                   className="rounded-md object-cover"
                   data-ai-hint="snack food"
                 />
                 <div className="flex-1">
-                  <h4 className="font-semibold">{item.snack.name}</h4>
+                  <h4 className="font-semibold">{item.snack?.name || "Unknown Snack"}</h4>
                   <p className="text-sm text-muted-foreground">
-                    {item.quantity} x ₦{item.snack.price.toLocaleString()}
+                    {item.quantity} x ₦{item.snack?.price?.toLocaleString() || item.price?.toLocaleString() || "-"}
                   </p>
                 </div>
                 <p className="font-semibold text-right">

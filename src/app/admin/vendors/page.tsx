@@ -57,16 +57,28 @@ export default function AdminVendorsPage() {
     const totalPages = Math.ceil(totalVendors / ITEMS_PER_PAGE);
 
     const handleApprovalChange = async (vendorId: string, isApproved: boolean) => {
-        // API call to update vendor approval
-        // await fetch(`/api/admin/vendors/${vendorId}`, { method: 'PUT', body: JSON.stringify({ isApproved }) });
-        
-        setVendors(vendors.map(v => v.id === vendorId ? {...v, isApproved } : v));
-        const vendorName = vendors.find(v => v.id === vendorId)?.user.name;
-        toast({
-            title: `Vendor ${isApproved ? 'Approved' : 'Suspended'}`,
-            description: `${vendorName} has been updated.`,
-        });
+        try {
+            const res = await fetch(`/api/admin/vendors/${vendorId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isApproved }),
+            });
+            if (!res.ok) throw new Error('Failed to update vendor');
+            setVendors(vendors.map(v => v.id === vendorId ? { ...v, isApproved } : v));
+            const vendorName = vendors.find(v => v.id === vendorId)?.user.name;
+            toast({
+                title: `Vendor ${isApproved ? 'Approved' : 'Suspended'}`,
+                description: `${vendorName} has been updated.`,
+            });
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'Failed to update vendor status.',
+                variant: 'destructive',
+            });
+        }
     };
+
 
     const handleDeleteVendor = (vendor: Vendor) => {
         setSelectedVendor(vendor);
@@ -75,12 +87,23 @@ export default function AdminVendorsPage() {
 
     const confirmDeleteVendor = async () => {
         if(selectedVendor) {
-            // await fetch(`/api/admin/vendors/${selectedVendor.id}`, { method: 'DELETE' });
-            setVendors(vendors.filter(v => v.id !== selectedVendor.id));
-             toast({
-                title: "Vendor Deleted",
-                description: `${selectedVendor.user.name} has been removed.`,
-            });
+            try {
+                const res = await fetch(`/api/admin/vendors/${selectedVendor.id}`, {
+                    method: 'DELETE',
+                });
+                if (!res.ok) throw new Error('Failed to delete vendor');
+                setVendors(vendors.filter(v => v.id !== selectedVendor.id));
+                toast({
+                    title: "Vendor Deleted",
+                    description: `${selectedVendor.user.name} has been removed.`,
+                });
+            } catch (error) {
+                toast({
+                    title: 'Error',
+                    description: 'Failed to delete vendor.',
+                    variant: 'destructive',
+                });
+            }
         }
         setIsDeleteDialogOpen(false);
         setSelectedVendor(null);
