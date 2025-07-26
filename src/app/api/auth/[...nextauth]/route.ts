@@ -56,21 +56,16 @@ const handler = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.avatarUrl = token.avatarUrl as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
       }
       return session;
     },
      async redirect({ url, baseUrl }) {
-      const callbackUrl = new URL(url, baseUrl).searchParams.get('callbackUrl');
-      if (callbackUrl && callbackUrl.startsWith(baseUrl)) {
-        return callbackUrl;
-      }
-
       // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`
-      
+      if (url.startsWith('/')) return `${baseUrl}${url}`
       // Allows callback URLs on the same origin
-      if (new URL(url).origin === baseUrl) return url
-
+      else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     }
   },
