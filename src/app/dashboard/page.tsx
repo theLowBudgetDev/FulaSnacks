@@ -3,9 +3,10 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { format, subDays } from "date-fns";
 import DashboardPageClient from "./DashboardPageClient";
+import { authOptions } from "@/lib/auth";
 
 export default async function DashboardPage() {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user || !(session.user as any).id) {
         redirect('/login');
     }

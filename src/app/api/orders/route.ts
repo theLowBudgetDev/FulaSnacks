@@ -2,11 +2,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import type { CartItem } from "@/lib/types";
 
 // GET orders for the logged-in user
 export async function GET(req: Request) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   const user = session?.user as any;
   if (!session || !user || !user.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -54,7 +55,7 @@ export async function GET(req: Request) {
 
 // POST a new order
 export async function POST(req: Request) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const user = session?.user as any;
     if (!session || !user || !user.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

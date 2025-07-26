@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 async function getVendorId(userId: string) {
     const vendor = await prisma.vendor.findUnique({ where: { userId } });
@@ -13,7 +14,7 @@ async function getVendorId(userId: string) {
 
 // GET all products for a vendor
 export async function GET(req: Request) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user || !(session.user as any).id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -46,7 +47,7 @@ export async function GET(req: Request) {
 
 // POST a new product for a vendor
 export async function POST(req: Request) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user || !(session.user as any).id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

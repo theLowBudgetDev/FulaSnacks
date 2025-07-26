@@ -2,10 +2,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 // UPDATE user profile
 export async function PUT(req: Request) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session || !session.user || !(session.user as any).id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
