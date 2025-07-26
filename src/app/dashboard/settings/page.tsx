@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 
 export default function SettingsPage() {
   const { data: session, update } = useSession();
@@ -79,16 +80,20 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
+                    <Label>Logo</Label>
+                    <ImageUpload 
+                        value={logoUrl} 
+                        onChange={(url) => setLogoUrl(url)}
+                        disabled={loading}
+                    />
+                </div>
+                <div className="space-y-2">
                     <Label htmlFor="vendor-name">Vendor Name</Label>
                     <Input id="vendor-name" value={vendorName} onChange={e => setVendorName(e.target.value)} disabled={loading}/>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" value={email} disabled />
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="logo-url">Logo URL</Label>
-                    <Input id="logo-url" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} disabled={loading}/>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="campus-location">Campus Location</Label>

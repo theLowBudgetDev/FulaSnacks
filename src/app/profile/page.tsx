@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Snack, User } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 
 export default function ProfilePage() {
     const { data: session, update } = useSession();
@@ -137,12 +138,16 @@ export default function ProfilePage() {
                     <CardContent className="max-w-lg">
                        <form onSubmit={handleUpdateProfile} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="fullname">Full Name</Label>
-                                <Input id="fullname" value={name} onChange={(e) => setName(e.target.value)} disabled={loadingProfile}/>
+                                <Label>Avatar</Label>
+                                <ImageUpload 
+                                    value={avatarUrl} 
+                                    onChange={(url) => setAvatarUrl(url)}
+                                    disabled={loadingProfile}
+                                />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="avatarUrl">Avatar URL</Label>
-                                <Input id="avatarUrl" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} disabled={loadingProfile}/>
+                                <Label htmlFor="fullname">Full Name</Label>
+                                <Input id="fullname" value={name} onChange={(e) => setName(e.target.value)} disabled={loadingProfile}/>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email Address</Label>

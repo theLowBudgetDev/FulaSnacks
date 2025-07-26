@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Table,
@@ -16,7 +18,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, ShoppingBag, Package } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DollarSign, ShoppingBag, Package, ArrowRight } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -175,6 +178,14 @@ export default function DashboardPageClient({
               </TableBody>
             </Table>
           </CardContent>
+           <CardFooter className="justify-end">
+            <Button asChild variant="link" size="sm">
+              <Link href="/dashboard/orders">
+                View All Orders
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </div>

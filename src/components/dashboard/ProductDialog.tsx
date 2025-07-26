@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { ImageUpload } from "../shared/ImageUpload";
 
 interface ProductDialogProps {
   open: boolean;
@@ -79,6 +80,10 @@ export function ProductDialog({ open, onOpenChange, onSave, product }: ProductDi
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+                <Label>Snack Image</Label>
+                <ImageUpload value={imageUrl} onChange={(url) => setImageUrl(url)} />
+            </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
               Name
@@ -102,12 +107,6 @@ export function ProductDialog({ open, onOpenChange, onSave, product }: ProductDi
               Price (₦)
             </Label>
             <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} className="col-span-3" />
-          </div>
-           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="imageUrl" className="text-right">
-              Image URL
-            </Label>
-            <Input id="imageUrl" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="col-span-3" />
           </div>
         </div>
         <DialogFooter>

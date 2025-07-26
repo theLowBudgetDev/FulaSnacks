@@ -15,7 +15,7 @@ export default async function AdminDashboardPage() {
   const totalOrdersCount = await prisma.order.count();
 
   const recentOrders = await prisma.order.findMany({
-    take: 5,
+    take: 3,
     orderBy: { createdAt: "desc" },
     include: { user: true },
   });

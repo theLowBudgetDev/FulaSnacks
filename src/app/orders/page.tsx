@@ -14,12 +14,13 @@ import { PaginationComponent } from '@/components/shared/PaginationComponent';
 import { ReviewDialog } from '@/components/shared/ReviewDialog';
 import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 5;
 
 export default function OrdersPage() {
   const { data: session } = useSession();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -37,7 +38,7 @@ export default function OrdersPage() {
         const params = new URLSearchParams({
           page: String(currentPage),
           limit: String(ITEMS_PER_PAGE),
-          status: currentTab === 'active' ? 'active' : 'past'
+          status: currentTab
         });
         const res = await fetch(`/api/orders?${params.toString()}`);
         if(res.ok) {
@@ -53,6 +54,13 @@ export default function OrdersPage() {
 
 
   const totalPages = Math.ceil(totalOrders / ITEMS_PER_PAGE);
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', value);
+    params.set('page', '1');
+    router.push(`/orders?${params.toString()}`);
+  }
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -142,7 +150,7 @@ export default function OrdersPage() {
           <h1 className="font-headline text-4xl font-bold tracking-tight md:text-5xl">My Orders</h1>
           <p className="mt-2 text-lg text-muted-foreground">Track your current orders and review your order history.</p>
         </div>
-        <Tabs defaultValue="active" className="w-full">
+        <Tabs defaultValue={currentTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
             <TabsTrigger value="active">Active Orders</TabsTrigger>
             <TabsTrigger value="past">Past Orders</TabsTrigger>

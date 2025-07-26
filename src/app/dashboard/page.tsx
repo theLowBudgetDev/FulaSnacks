@@ -33,7 +33,7 @@ export default async function DashboardPage() {
         }),
         prisma.order.findMany({
             where: { items: { some: { snack: { vendorId: vendor.id }}}},
-            take: 5,
+            take: 3,
             orderBy: { createdAt: 'desc' },
             include: { user: true }
         }),
